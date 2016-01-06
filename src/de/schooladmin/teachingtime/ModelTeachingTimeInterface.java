@@ -4,4 +4,6 @@ import de.schooladmin.ModelInterface;
 
 public interface ModelTeachingTimeInterface extends ModelInterface {
 
+	void initTeachers(String fileTeachers);
+
 }

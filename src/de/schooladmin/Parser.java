@@ -54,7 +54,7 @@ public class Parser implements ParserInterface {
 	}
 
 	/** Template method that calls {@link #processLine(String)}. */
-	public final void processLineByLine() throws IOException {
+	public final void processLineByLine()  {
 		table.add(this.variablen);
 		try (Scanner scanner = new Scanner(filePath, this.ENCODING.name())) {
 			while (this.skipLine > 0) {
@@ -64,6 +64,8 @@ public class Parser implements ParserInterface {
 			while (scanner.hasNextLine()) {
 				processLine(scanner.nextLine());
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

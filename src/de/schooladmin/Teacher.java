@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Class for teachers
@@ -21,8 +20,8 @@ public class Teacher {
 	private String surname;
 	private String firstname;
 	private String abbr;
-	private Date birthday;
-	private gender gender;
+	private String birthday;
+	private String gender;
 	private double toDo; // Sollstunden
 	private double actDo; // aktueller Einsatz
 	private String schoolType;
@@ -30,10 +29,6 @@ public class Teacher {
 	private ArrayList<SchoolGroup> schoolGroups;
 	
 	private BufferedReader in;
-
-	private enum gender {
-		F, M
-	};
 
 	// private enum schooltype {R, G, H};
 	private String[] teacherSpmText;
@@ -45,12 +40,16 @@ public class Teacher {
 		this.surname = surname;
 		this.firstname = firstname;
 		this.abbr = abbr;
-		// this.gender = gender.F;
-		//this.teacherData = teacherData;
 		this.toDo = 0;
 		this.actDo = 0;
-		this.schoolType = "";		
 		this.schoolType = "Schultyp fehlt";		
+	}
+	
+	public Teacher(String surname, String firstname, String abbr, String gender, String birthday, int toDo) {
+		this(surname, firstname, abbr);
+		this.gender = gender;
+		this.birthday = birthday;
+		this.toDo = toDo;
 	}
 	
 	public Teacher(String surname, String firstname, String abbr, String fileName) {
@@ -178,7 +177,7 @@ public class Teacher {
 	/**
 	 * @return the gender
 	 */
-	public gender getGender() {
+	public String getGender() {
 		return gender;
 	}
 
@@ -186,14 +185,14 @@ public class Teacher {
 	 * @param gender
 	 *            the gender to set
 	 */
-	public void setGender(gender gender) {
+	public void setGender(String gender) {
 		this.gender = gender;
 	}
 
 	/**
 	 * @return the birthday
 	 */
-	public Date getBirthday() {
+	public String getBirthday() {
 		return birthday;
 	}
 
@@ -201,7 +200,7 @@ public class Teacher {
 	 * @param birthday
 	 *            the birthday to set
 	 */
-	public void setBirthday(Date birthday) {
+	public void setBirthday(String birthday) {
 		this.birthday = birthday;
 	}
 
