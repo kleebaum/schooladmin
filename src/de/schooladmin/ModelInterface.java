@@ -1,13 +1,13 @@
 package de.schooladmin;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public interface ModelInterface {
 	
 	// input file location
-	String FileConfig = "input/config.txt";
-	String FileLehrer = "input/LehrerDaten.csv";
-	String version = "0.9.2";
+	final String ConfigFile = "input/config.txt";
+	final String version = "1.0.3";
 	
 	/**
 	 * observing view is registered
@@ -26,8 +26,9 @@ public interface ModelInterface {
 	
 	/**
 	 * initializes the program's model, first method called
+	 * @throws FileNotFoundException 
 	 */
-	void initialize();
+	void initialize() throws FileNotFoundException;
 	
 	/**
 	 * returns the teacher belonging to a certain abbreviation
@@ -71,7 +72,10 @@ public interface ModelInterface {
 	 */
 	ArrayList<Teacher> getTeachers();
 
+	/**
+	 * 
+	 * @return program name
+	 */
 	String getName();
-
 
 }

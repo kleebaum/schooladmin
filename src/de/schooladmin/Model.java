@@ -10,6 +10,7 @@ import java.util.Properties;
 public class Model implements ModelInterface {
 	
 	protected Properties prop;
+	protected String name;
 	protected ArrayList<Teacher> teachers;
 	protected HashMap<String, Teacher> teacherAbbrMap = new HashMap<String, Teacher>(); 
 	private String error = "";
@@ -65,8 +66,8 @@ public class Model implements ModelInterface {
 
 	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
-
+		prop = readConfig(ConfigFile);
+		this.name = prop.get("Name").toString();
 	}
 	
 	@Override
@@ -109,7 +110,6 @@ public class Model implements ModelInterface {
 
 	@Override
 	public String getName() {
-		return "GSH Smart Admin: ";
+		return this.name;
 	}
-
 }

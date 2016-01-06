@@ -10,8 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 
-import de.schooladmin.roomalloc.ModelRoomAlloc;
-
 /**
  * Class for teachers
  * 
@@ -55,11 +53,16 @@ public class Teacher {
 		this.schoolType = "Schultyp fehlt";		
 	}
 	
-	private void readTeacherTimeTableTextFromFile() throws FileNotFoundException {
+	public Teacher(String surname, String firstname, String abbr, String fileName) {
+		this(surname, firstname, abbr);
+		this.timeTableText = readTeacherTimeTableTextFromFile(fileName);
+	}
+	
+	private String readTeacherTimeTableTextFromFile(String fileName) {
 		String timeTableText = "";
 		boolean foundRoom = false;
 		try {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(ModelRoomAlloc.FileLehrerStundenplaene),
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName),
 					StandardCharsets.ISO_8859_1));
 			String zeile = null;
 			while ((zeile = in.readLine()) != null) {
@@ -91,15 +94,15 @@ public class Teacher {
 			e.printStackTrace();
 		}
 		if (timeTableText.equals(""))
-			this.timeTableText = timeTableText;
-		this.timeTableText = this.timestamp +"\r\n" + timeTableText;
+			return(timeTableText);
+		return(this.timestamp +"\r\n" + timeTableText);
 	}
 
-	public String[] readTeacherSpmTextFromFile()  throws FileNotFoundException  {
+	public String[] readTeacherSpmTextFromFile(String fileName)  throws FileNotFoundException  {
 		boolean foundSpm = false;
 		ArrayList<String> spmArrayList = new ArrayList<String>();
 		try {
-			in = new BufferedReader(new FileReader(ModelRoomAlloc.FileLehrerSpm));
+			in = new BufferedReader(new FileReader(fileName));
 			String zeile = null;
 			while ((zeile = in.readLine()) != null) {
 				if (foundSpm == true) {

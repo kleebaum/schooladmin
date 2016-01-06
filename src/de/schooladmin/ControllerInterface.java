@@ -1,6 +1,5 @@
 package de.schooladmin;
 
-
 public interface ControllerInterface {
 	
 	void addView(ViewInterface view);

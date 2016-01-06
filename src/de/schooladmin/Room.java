@@ -13,8 +13,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-import de.schooladmin.roomalloc.ModelRoomAlloc;
-
 public class Room {
 	private int space, x, y, xLength, yLength;
 	private String name, addOn;
@@ -29,7 +27,7 @@ public class Room {
 	private BufferedReader in;
 	private Scanner scanner;
 
-	public Room(String name, int space, int x, int y, int xLength, int yLength, String addOn, String roomArea) {
+	public Room(String name, int space, int x, int y, int xLength, int yLength, String addOn, String roomArea, String fileTimeTableRooms) {
 		this.name = name;
 		this.space = space;
 		this.x = x;
@@ -60,7 +58,7 @@ public class Room {
 		default:
 			this.roomArea = RoomArea.NA;
 		}
-		this.roomAllocationText = readRoomAllocationTextFromFile();
+		this.roomAllocationText = readRoomAllocationTextFromFile(fileTimeTableRooms);
 		this.roomAllocation = fillRoomAllocationArray();
 	}
 
@@ -101,11 +99,11 @@ public class Room {
 		return roomAllocation;
 	}
 
-	private String readRoomAllocationTextFromFile() {
+	private String readRoomAllocationTextFromFile(String fileName) {
 		String roomAllocationText = "";
 		boolean foundRoom = false;
 		try {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(ModelRoomAlloc.FileRaeumeSpm), StandardCharsets.ISO_8859_1));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1));
 			String zeile = null;
 			while ((zeile = in.readLine()) != null) {
 				if (foundRoom == true) {

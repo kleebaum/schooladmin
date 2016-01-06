@@ -40,7 +40,6 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 	ModelInterface model;
 	ControllerInterface controller;
 
-	protected String title = "GSH Smart Admin";
 	protected JFrame loadingFrame;
 	protected JFrame viewFrame;
 	protected JPanel viewPanel;
@@ -84,8 +83,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 	@Override
 	public void initView() {
-		title = getTitle();
-		viewFrame = new JFrame(title);
+		viewFrame = new JFrame(model.getName());
 		viewFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		viewFrame.addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent e) {
@@ -129,21 +127,21 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 	@Override
 	public void loadingFrame() {
-		if (loadingFrame == null) {
-
-			loadingFrame = new JFrame();
-			loadingFrame.setUndecorated(true);
-			loadingFrame.setContentPane(new JLabel(splash));
-			
-			loadingFrame.setSize(splash.getIconWidth(), splash.getIconHeight());
-			loadingFrame.setLocationRelativeTo(null);
-			loadingFrame.pack();
-		}
-		if (loadingFrame.isVisible()) {
-			loadingFrame.setVisible(false);
-		} else {
-			loadingFrame.setVisible(true);
-		}
+//		if (loadingFrame == null) {
+//
+//			loadingFrame = new JFrame();
+//			loadingFrame.setUndecorated(true);
+//			loadingFrame.setContentPane(new JLabel(splash));
+//			
+//			loadingFrame.setSize(splash.getIconWidth(), splash.getIconHeight());
+//			loadingFrame.setLocationRelativeTo(null);
+//			loadingFrame.pack();
+//		}
+//		if (loadingFrame.isVisible()) {
+//			loadingFrame.setVisible(false);
+//		} else {
+//			loadingFrame.setVisible(true);
+//		}
 	}
 
 	@Override
@@ -166,15 +164,11 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 	public void createCards() {
 	}
-	
-	public String getTitle() {
-		return title;
-	}
-	
+		
 	@Override
 	public void createHelpMenu() {
 		menuHelp = new JMenu("Hilfe");
-		JMenuItem menuItemAbout = new JMenuItem("\u00dcber GSH Smart Admin");
+		JMenuItem menuItemAbout = new JMenuItem("\u00dcber " + model.getName());
 		menuBar.add(menuHelp);
 		menuHelp.add(menuItemAbout);
 		ImageIcon imgIcon = (ImageIcon) icon;
@@ -192,7 +186,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 	
 	@Override
 	public void createHelpView() {		
-		final JFrame frame = new JFrame("About GSH Smart Admin");
+		final JFrame frame = new JFrame("\u00dcber " + model.getName());
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setIconImage(((ImageIcon) icon).getImage());
 
@@ -201,7 +195,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 		box.add(new JLabel(" " + model.getName() + " "));
 		box.add(new JLabel(" Version: " + ModelInterface.version));
 		box.add(new JLabel(" Entwickelt von Anja Kleebaum "));
-		box.add(new JLabel(" Kontakt: Anja.Kleebaum@Kleebaum.de "));
+		box.add(new JLabel(" Kontakt: Anja [dot] Kleebaum [at] Kleebaum [dot] de "));
 		box.add(Box.createGlue());
 		frame.getContentPane().add(box, "Center");
 
@@ -221,7 +215,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
+
 	@Override
 	public void errorWindow(String message) {		
 //		final JFrame frame = new JFrame("Fehlermeldung");

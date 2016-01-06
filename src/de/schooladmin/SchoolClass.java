@@ -13,8 +13,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import de.schooladmin.roomalloc.ModelRoomAlloc;
-
 public class SchoolClass {
 	private String name;
 	private String timeTableText;
@@ -24,20 +22,24 @@ public class SchoolClass {
 
 	public SchoolClass(String name) {
 		this.name = name;
-		this.timeTableText = readClassTimeTableTextFromFile();
+	}
+	
+	public SchoolClass(String name, String fileName) {
+		this(name);
+		this.timeTableText = readClassTimeTableTextFromFile(fileName);
 	}
 	
 	public SchoolClass(String name, ArrayList<SchoolSubject> subjects) {
-		this.name = name;
+		this(name);
 		this.subjects = subjects;	
 	}
 
-	private String readClassTimeTableTextFromFile() {
+	private String readClassTimeTableTextFromFile(String fileName) {
 		String timeTableText = "";
 		boolean foundClass = false;
 		try {
 			in = new BufferedReader(new InputStreamReader(new FileInputStream(
-					ModelRoomAlloc.FileKlassenStundenplaene),
+					fileName),
 					StandardCharsets.ISO_8859_1));
 			String zeile = null;
 			while ((zeile = in.readLine()) != null) {

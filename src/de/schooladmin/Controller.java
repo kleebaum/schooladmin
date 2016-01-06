@@ -1,6 +1,5 @@
 package de.schooladmin;
 
-
 public class Controller implements ControllerInterface {
 	private ModelInterface model;
 	private ViewInterface view;
