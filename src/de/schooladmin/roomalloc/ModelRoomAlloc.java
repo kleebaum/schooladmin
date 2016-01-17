@@ -36,7 +36,6 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 	// lists containing needed instances of classes Room, Teacher, SchoolClass
 	// and SchoolTime
 	private ArrayList<Room> rooms;
-	private ArrayList<SchoolClass> classes;
 	private ArrayList<SchoolTime> times;
 
 	private BufferedReader in;
@@ -141,26 +140,7 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 		header.add("Nachname");
 		header.add("Vorname");
 		header.add("Abk");
-//		header.add("S_Typ");
 		header.add("Geb.Datum");
-//		header.add("TZ");
-//		header.add("AK");
-//		header.add("wi");
-//		header.add("b");
-//		header.add("a");
-//		header.add("x");
-//		header.add("v");
-//		header.add("UeD");
-//		header.add("SL");
-//		header.add("P");
-//		header.add("Fkt");
-//		header.add("So");
-//		header.add("Anr.-Text");
-//		header.add("Soll");
-//		header.add("Mob");
-//		header.add("E1");
-//		header.add("E2");
-//		header.add("S1HJ");
 		ParserInterface nameListParser = new Parser(fileTeachers, "[\\s]*;[\\s]*", StandardCharsets.ISO_8859_1, 1, header);
 		try {
 			nameListParser.processLineByLine();
@@ -178,15 +158,6 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 			String surname = line.get(0);
 			String firstname = line.get(1);
 			String abbr = line.get(2);
-//			String[] teacherData = new String[header.size() - 3];
-//			for (int i = 0; i < header.size() - 3; i++) {
-//				int headerLength = header.get(i + 3).length();
-//				String whitespaces = "";
-//				for (int j = 0; j < 10 - headerLength; j++) {
-//					whitespaces += " ";
-//				}
-//				teacherData[i] = header.get(i + 3) + ":" + whitespaces + line.get(i + 3);
-//			}
 			teachers.add(new Teacher(surname, firstname, abbr, fileTimeTableTeachers));
 			lineCount++;
 		}
@@ -205,7 +176,7 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 					String[] splitItems = zeile.split(" ");
 					for (int i = 0; i < splitItems.length; i++) {
 						if (splitItems[i].equals("Klasse")) {
-							classes.add(new SchoolClass(splitItems[i + 1]));
+							classes.add(new SchoolClass(splitItems[i + 1], fileName));
 						}
 					}
 				}
@@ -391,17 +362,6 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 	@Override
 	public void setClasses(ArrayList<SchoolClass> classes) {
 		this.classes = classes;
-	}
-
-	@Override
-	public void setSelectedClass(SchoolClass selectedClass) {
-		this.selectedClass = selectedClass;
-		notifyObservers();
-	}
-
-	@Override
-	public SchoolClass getSelectedClass() {
-		return this.selectedClass;
 	}
 
 	@Override

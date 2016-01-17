@@ -20,11 +20,13 @@ public class ModelTeachingTime extends Model implements ModelTeachingTimeInterfa
 		super.initialize();
 		
 		String fileTeachers = prop.get("Teachers").toString();
-		initTeachers(fileTeachers);		
+		String fileTimeTableTeachers = prop.get("TimeTableTeachers").toString();
+
+		initTeachers(fileTeachers, fileTimeTableTeachers);
 	}
 	
 	@Override
-	public void initTeachers(String fileTeachers) {
+	public void initTeachers(String fileTeachers, String fileTimeTableTeachers) {
 		ArrayList<String> header = new ArrayList<String>();
 		header.add("Nachname");
 		header.add("Vorname");
@@ -70,7 +72,7 @@ public class ModelTeachingTime extends Model implements ModelTeachingTimeInterfa
 			String firstname = line.get(1);
 			String abbr = line.get(2);
 			
-			Teacher teacher = new Teacher(surname, firstname, abbr);
+			Teacher teacher = new Teacher(surname, firstname, abbr, fileTimeTableTeachers);
 			
 			teachers.add(teacher);
 			teacherAbbrMap.put(abbr, teacher);

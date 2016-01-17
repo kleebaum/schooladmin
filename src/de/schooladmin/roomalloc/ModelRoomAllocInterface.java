@@ -102,19 +102,6 @@ public interface ModelRoomAllocInterface extends ModelInterface {
 	Room getSelectedRoom();
 
 	/**
-	 * sets selected class
-	 * 
-	 * @param selectedClass
-	 */
-	void setSelectedClass(SchoolClass selectedClass);
-
-	/**
-	 * 
-	 * @return selected class
-	 */
-	SchoolClass getSelectedClass();
-
-	/**
 	 * initializes room list
 	 * 
 	 * @param rooms

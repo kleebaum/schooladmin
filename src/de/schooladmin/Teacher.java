@@ -2,7 +2,6 @@ package de.schooladmin;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -55,6 +54,7 @@ public class Teacher {
 	public Teacher(String surname, String firstname, String abbr, String fileName) {
 		this(surname, firstname, abbr);
 		this.timeTableText = readTeacherTimeTableTextFromFile(fileName);
+		this.teacherSpmText = readTeacherSpmTextFromFile(fileName);
 	}
 	
 	private String readTeacherTimeTableTextFromFile(String fileName) {
@@ -97,7 +97,7 @@ public class Teacher {
 		return(this.timestamp +"\r\n" + timeTableText);
 	}
 
-	public String[] readTeacherSpmTextFromFile(String fileName)  throws FileNotFoundException  {
+	public String[] readTeacherSpmTextFromFile(String fileName){
 		boolean foundSpm = false;
 		ArrayList<String> spmArrayList = new ArrayList<String>();
 		try {

@@ -1,7 +1,13 @@
 package de.schooladmin;
 
+import java.awt.Component;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+
 import javax.swing.JList;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 /**
  * @author Anja Kleebaum
@@ -36,7 +42,7 @@ public interface ViewInterface {
 	/**
 	 * creates program info
 	 */
-	public abstract void createHelpView();
+	public abstract void helpWindow();
 
 	/**
 	 * creates help menu entry
@@ -55,7 +61,42 @@ public interface ViewInterface {
 	 */
 	public abstract JList<String> createTeacherNameList();
 
-	
+	/**
+	 * things to do before exiting program
+	 * 
+	 */
 	public abstract void exitProgram();
 
+	/**
+	 * exports table to text file
+	 * @param className
+	 */
+	void exportTableDataToCVS(String folder, String fileName, String header, 
+			ArrayList<String> content, boolean fileChooser);
+
+	/**
+	 * prints a gui component
+	 * @param toPrint
+	 * @param name
+	 */
+	void print(Component toPrint, String name);
+
+	/**
+	 * creates menu bar
+	 * @return
+	 */
+	JMenuBar createMenuBar();
+
+	/**
+	 * creates cards
+	 */
+	void createCards();
+
+	/**
+	 * creates default pop up menu items
+	 * @param e
+	 * @return JPopupMenu popupMenu
+	 */
+	JPopupMenu createPopUpMenu(MouseEvent e);
+	
 }

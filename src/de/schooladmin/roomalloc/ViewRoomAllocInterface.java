@@ -1,7 +1,5 @@
 package de.schooladmin.roomalloc;
 
-import java.awt.Component;
-
 import javax.swing.JPanel;
 
 import de.schooladmin.ViewInterface;
@@ -19,11 +17,6 @@ public interface ViewRoomAllocInterface extends ViewInterface {
 	 * creates card in CardLayout "Raumplan" at program start
 	 */
 	public abstract void createRoomView();
-
-	/**
-	 * creates card in CardLayout "LehrerUPZ" at program start
-	 */
-	public abstract void createUpzView();
 
 	/**
 	 * creates card in CardLayout "Stundenplaene" at program start
@@ -48,13 +41,6 @@ public interface ViewRoomAllocInterface extends ViewInterface {
 			int areaLength);
 
 	/**
-	 * method for printing GUI components
-	 * 
-	 * @param toPrint
-	 */
-	public abstract void print(Component toPrint);
-
-	/**
 	 * shows String content in a text area
 	 * 
 	 * @param title
@@ -70,11 +56,6 @@ public interface ViewRoomAllocInterface extends ViewInterface {
 	 * updates card in CardLayout called "Raumplan"
 	 */
 	public abstract void updateAllRoomAllocation();
-
-	/**
-	 * updates card in CardLayout called "LehrerUPZ"
-	 */	
-	public abstract void updateUpz();
 	
 	/**
 	 * returns all room allocation for selected time and hour

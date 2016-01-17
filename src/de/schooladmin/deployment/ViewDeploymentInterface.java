@@ -7,5 +7,8 @@ import de.schooladmin.ViewInterface;
  *
  */
 public interface ViewDeploymentInterface extends ViewInterface {
+	void createOverView();
+	void createClassesView();
+	void exportTableDataToCVS(String className, boolean fileChooser);
 
 }

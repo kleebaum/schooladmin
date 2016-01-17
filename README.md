@@ -1,2 +1,2 @@
 # schooladmin
-Java program to administrate a school
+Java program to administrate a school.

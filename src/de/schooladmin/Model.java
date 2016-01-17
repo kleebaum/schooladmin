@@ -12,11 +12,21 @@ public class Model implements ModelInterface {
 	protected Properties prop;
 	protected String name;
 	protected ArrayList<Teacher> teachers;
-	protected HashMap<String, Teacher> teacherAbbrMap = new HashMap<String, Teacher>(); 
+	protected ArrayList<SchoolClass> classes;
+	protected HashMap<String, Teacher> teacherAbbrMap = new HashMap<String, Teacher>();
+	protected HashMap<String, SchoolClass> classNameMap = new HashMap<String, SchoolClass>();
 	private String error = "";
 	
 	protected Teacher selectedTeacher = null;
 	protected SchoolClass selectedClass;
+	
+	// list containing observing views
+	public ArrayList<ObserverInterface> observers = new ArrayList<ObserverInterface>();
+	
+	public Model() {
+		this.teachers = new ArrayList<Teacher>();
+		this.classes = new ArrayList<SchoolClass>();
+	}
 
 	public Properties readConfig(String fileName) {
 		prop = new Properties();
@@ -28,7 +38,6 @@ public class Model implements ModelInterface {
 
 			// load a properties file
 			prop.load(input);
-
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -42,9 +51,6 @@ public class Model implements ModelInterface {
 		}
 		return prop;
 	}
-
-	// list containing observing views
-	public ArrayList<ObserverInterface> observers = new ArrayList<ObserverInterface>();
 
 	@Override
 	public void registerObserver(ObserverInterface o) {
@@ -77,6 +83,12 @@ public class Model implements ModelInterface {
 		return teacherAbbrMap.get(abbr);
 	}
 	
+	public SchoolClass getClassByName(String name) {
+		if (name.equals(""))
+			return null;
+		return classNameMap.get(name);
+	}
+	
 	@Override
 	public String getError() {
 		return error;
@@ -98,6 +110,11 @@ public class Model implements ModelInterface {
 		notifyObservers();
 	}
 	
+	public void setSelectedTeacher(String abbr) {
+		this.selectedTeacher = this.getTeacherByAbbr(abbr);
+		notifyObservers();
+	}
+	
 	@Override
 	public void setTeachers(ArrayList<Teacher> teachers) {
 		this.teachers = teachers;
@@ -112,4 +129,28 @@ public class Model implements ModelInterface {
 	public String getName() {
 		return this.name;
 	}
+	
+	@Override
+	public void setSelectedClass(SchoolClass selectedClass) {
+		this.selectedClass = selectedClass;
+		notifyObservers();
+	}
+	
+	@Override
+	public void setSelectedClass(String className) {
+		this.selectedClass = this.getClassByName(className);
+	}
+
+	@Override
+	public SchoolClass getSelectedClass() {
+		return this.selectedClass;
+	}
+
+	@Override
+	public void teacherAddToActDo(Teacher teacher, double value) {
+		teacher.addToActDo(value);
+		notifyObservers();
+	}
+	
+
 }

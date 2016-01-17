@@ -18,11 +18,8 @@ import de.schooladmin.Teacher;
  */
 public class ModelDeployment extends Model implements ModelDeploymentInterface {
 
-	protected ArrayList<SchoolClass> classes;
-
 	public ModelDeployment() {
-		this.teachers = new ArrayList<Teacher>();
-		this.classes = new ArrayList<SchoolClass>();
+		super();
 	}
 
 	@Override
@@ -32,14 +29,12 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 		String fileTeachers = prop.get("Teachers").toString();
 		initTeachers(fileTeachers);		
 
-		for (String klasse : prop.get("SchoolClasses").toString().split("\\s*,\\s*")) {
-			klasse = klasse.trim();
-			ArrayList<SchoolSubject> localSubjects = initSchoolClasses(klasse);
-			SchoolClass localClass = new SchoolClass(klasse, localSubjects);
+		for (String className : prop.get("SchoolClasses").toString().split("\\s*,\\s*")) {
+			className = className.trim();
+			ArrayList<SchoolSubject> localSubjects = initSchoolClasses(className);
+			SchoolClass localClass = new SchoolClass(className, localSubjects);
 			classes.add(localClass);
-			// for (SchoolSubject subject : localClass.getSubjects()) {
-			// System.out.println(subject.getName());
-			// }
+			classNameMap.put(className, localClass);
 		}
 	}
 

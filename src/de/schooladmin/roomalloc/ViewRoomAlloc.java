@@ -1,23 +1,12 @@
 package de.schooladmin.roomalloc;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Desktop;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.print.PageFormat;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -41,7 +30,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import de.schooladmin.Printer;
 import de.schooladmin.Room;
 import de.schooladmin.SchoolClass;
 import de.schooladmin.Teacher;
@@ -65,18 +53,12 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		this.controller = controller;
 	}
 
-	JPanel upzPanel;
 	JPanel roomPanel;
 	JPanel listPanel;
 	JPanel showTextPanel;
 
-	JList<String> teacherSpmList;
-	JList<String> teacherDataList;
-
-	static JPopupMenu popupMenu;
-	JMenu menuUPZ;
-	JMenu menuRoom;
-	JMenu menuLists;
+	JList<String> teacherList1;
+	JList<String> teacherList2;
 
 	JLabel roomLabel;
 
@@ -86,19 +68,20 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 	public static ArrayList<JButton> rooms = new ArrayList<JButton>();
 
 	public void createCards() {
+		super.createCards();
 		createRoomView();
 		createListView();
 		cards.add(viewPanel, "viewPanel");
 		cards.add(roomPanel, "roomPanel");
 		cards.add(listPanel, "listPanel");
-		scrollPane.addMouseListener(new PopClickListener());
 	}
 
 	public JMenuBar createMenuBar() {
-		menuBar = new JMenuBar();
-		menuRoom = new JMenu("Raumplan");
-		menuLists = new JMenu("Stundenpl\u00E4ne");
-		menuUPZ = new JMenu("LehrerUPZ");
+		super.createMenuBar();
+		// menuFile.add(new JSeparator());
+		menuFile.add(menuItemClose);
+		JMenu menuRoom = new JMenu("Raumplan");
+		JMenu menuLists = new JMenu("Stundenpl\u00E4ne");
 
 		menuBar.add(menuRoom);
 		menuRoom.addMenuListener(new MenuListener() {
@@ -114,7 +97,6 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 			@Override
 			public void menuSelected(MenuEvent arg0) {
 				cardLayout.show(cards, "roomPanel");
-				// scrollPane.setSize(viewFrame.getPreferredSize());
 			}
 		});
 
@@ -132,66 +114,10 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 			@Override
 			public void menuSelected(MenuEvent arg0) {
 				cardLayout.show(cards, "listPanel");
-				// scrollPane.setSize(viewFrame.getPreferredSize());
 			}
 		});
 
 		return menuBar;
-	}
-
-	@Override
-	public void createUpzView() {
-		upzPanel = new JPanel();
-		initPanelLayout(upzPanel);
-
-		// teacher list
-		JPanel panelTeacher = new JPanel(new GridLayout(1, 0));
-		panelTeacher.setBorder(BorderFactory.createTitledBorder("Lehrer"));
-		final JList<String> teacherList = createTeacherNameList();
-		JScrollPane scrollPaneTeacherList = new JScrollPane(teacherList);
-		panelTeacher.add(scrollPaneTeacherList);
-		teacherList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evt) {
-				if (!evt.getValueIsAdjusting()) {
-					for (Teacher teacher : model.getTeachers()) {
-						if (teacher.getAbbr().equals(teacherList.getSelectedValue().split(" ")[0])) {
-							controller.setSelectedTeacher(teacher);
-						}
-					}
-				}
-			}
-		});
-		teacherList.addMouseListener(new PopClickListener());
-
-		JPanel panelTeacherData = new JPanel(new GridLayout(1, 0));
-		panelTeacherData.setBorder(BorderFactory.createTitledBorder("Daten"));
-		teacherDataList = new JList<String>();
-		teacherDataList.setFont(monospacedFont);
-		JScrollPane dataListScrollPane = new JScrollPane(teacherDataList);
-		panelTeacherData.add(dataListScrollPane);
-
-		JPanel panelTeacherSpm = new JPanel(new GridLayout(1, 0));
-		panelTeacherSpm.setBorder(BorderFactory.createTitledBorder("SPM"));
-		teacherSpmList = new JList<String>();
-		teacherSpmList.setFont(monospacedFont);
-		JScrollPane spmListScrollPane = new JScrollPane(teacherSpmList);
-		panelTeacherSpm.add(spmListScrollPane);
-
-		layout.setHorizontalGroup(layout
-				.createSequentialGroup()
-				.addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE, panelTeacher.getPreferredSize().width,
-						GroupLayout.PREFERRED_SIZE)
-				.addComponent(panelTeacherData, GroupLayout.PREFERRED_SIZE, panelTeacherData.getPreferredSize().width,
-						GroupLayout.PREFERRED_SIZE).addComponent(panelTeacherSpm));
-
-		layout.setVerticalGroup(layout.createSequentialGroup().addGroup(
-				layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-						.addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE, screenHeight,
-								GroupLayout.PREFERRED_SIZE)
-						.addComponent(panelTeacherData, GroupLayout.PREFERRED_SIZE, screenHeight,
-								GroupLayout.PREFERRED_SIZE)
-						.addComponent(panelTeacherSpm, GroupLayout.PREFERRED_SIZE, screenHeight,
-								GroupLayout.PREFERRED_SIZE)));
 	}
 
 	@Override
@@ -284,10 +210,10 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		// Teacher selection
 		JPanel panelTeacher = new JPanel(new GridLayout(1, 0));
 		panelTeacher.setBorder(BorderFactory.createTitledBorder("Lehrer"));
-		final JList<String> teacherList = createTeacherNameList();
-		JScrollPane scrollPaneTeacherList = new JScrollPane(teacherList);
+		teacherList1 = createTeacherNameList();
+		JScrollPane scrollPaneTeacherList = new JScrollPane(teacherList1);
 		panelTeacher.add(scrollPaneTeacherList);
-		teacherList.addMouseListener(new PopClickListener());
+		teacherList1.addMouseListener(new PopClickListener());
 
 		// Bereichsdefinition
 		JPanel panelAltbauUnten = new JPanel();
@@ -310,79 +236,54 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		fillRoomArea(panelHallen, "Hallen", RoomArea.HALLEN, ModelRoomAllocInterface.AltbauWidth,
 				ModelRoomAllocInterface.AltbauLength);
 
-		layout.setHorizontalGroup(layout
-				.createParallelGroup()
-				.addComponent(panelRoomLabel)
-				.addGroup(
-						layout.createSequentialGroup()
-								.addGroup(
-										layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-												.addComponent(panelDayOfWeek, GroupLayout.PREFERRED_SIZE,
-														panelDayOfWeek.getPreferredSize().width + 20,
-														GroupLayout.PREFERRED_SIZE)
-												.addComponent(panelHour, GroupLayout.PREFERRED_SIZE,
-														panelDayOfWeek.getPreferredSize().width + 20,
-														GroupLayout.PREFERRED_SIZE)
-												.addComponent(panelClass, GroupLayout.PREFERRED_SIZE,
-														panelDayOfWeek.getPreferredSize().width + 20,
-														GroupLayout.PREFERRED_SIZE))
-								.addGroup(
-										layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-												.addComponent(panelNeubauUnten, GroupLayout.PREFERRED_SIZE, panelWidth,
-														GroupLayout.PREFERRED_SIZE)
-												.addComponent(panelAltbauUnten, GroupLayout.PREFERRED_SIZE, panelWidth,
-														GroupLayout.PREFERRED_SIZE)
-												.addComponent(panelHallen, GroupLayout.PREFERRED_SIZE, panelWidth,
-														GroupLayout.PREFERRED_SIZE))
-								.addGroup(
-										layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-												.addComponent(panelNeubauOben, GroupLayout.PREFERRED_SIZE, panelWidth,
-														GroupLayout.PREFERRED_SIZE)
-												.addComponent(panelAltbauOben, GroupLayout.PREFERRED_SIZE, panelWidth,
-														GroupLayout.PREFERRED_SIZE)
-												.addComponent(panelKeller, GroupLayout.PREFERRED_SIZE, panelWidth,
-														GroupLayout.PREFERRED_SIZE))
-								.addGroup(
-										layout.createParallelGroup(GroupLayout.Alignment.TRAILING).addComponent(
-												panelTeacher))));
+		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(panelRoomLabel)
+				.addGroup(layout.createSequentialGroup()
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+								.addComponent(panelDayOfWeek, GroupLayout.PREFERRED_SIZE,
+										panelDayOfWeek.getPreferredSize().width + 20, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelHour, GroupLayout.PREFERRED_SIZE,
+								panelDayOfWeek.getPreferredSize().width + 20, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelClass, GroupLayout.PREFERRED_SIZE,
+								panelDayOfWeek.getPreferredSize().width + 20, GroupLayout.PREFERRED_SIZE))
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addComponent(panelNeubauUnten, GroupLayout.PREFERRED_SIZE, panelWidth,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelAltbauUnten, GroupLayout.PREFERRED_SIZE, panelWidth,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelHallen, GroupLayout.PREFERRED_SIZE, panelWidth, GroupLayout.PREFERRED_SIZE))
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addComponent(panelNeubauOben, GroupLayout.PREFERRED_SIZE, panelWidth,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelAltbauOben, GroupLayout.PREFERRED_SIZE, panelWidth,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelKeller, GroupLayout.PREFERRED_SIZE, panelWidth, GroupLayout.PREFERRED_SIZE))
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING).addComponent(panelTeacher))));
 
-		layout.setVerticalGroup(layout
-				.createSequentialGroup()
+		layout.setVerticalGroup(layout.createSequentialGroup()
 				.addComponent(panelRoomLabel, GroupLayout.PREFERRED_SIZE, panelLength / 8, GroupLayout.PREFERRED_SIZE)
-				.addGroup(
-						layout.createBaselineGroup(false, true)
-								.addGroup(
-										layout.createSequentialGroup()
-												.addGroup(
-														layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-																.addComponent(panelDayOfWeek,
-																		GroupLayout.PREFERRED_SIZE, panelLength,
-																		GroupLayout.PREFERRED_SIZE)
-																.addComponent(panelNeubauUnten,
-																		GroupLayout.PREFERRED_SIZE, panelLength,
-																		GroupLayout.PREFERRED_SIZE)
-																.addComponent(panelNeubauOben,
-																		GroupLayout.PREFERRED_SIZE, panelLength,
-																		GroupLayout.PREFERRED_SIZE))
-												.addGroup(
-														layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-																.addComponent(panelHour, GroupLayout.PREFERRED_SIZE,
-																		panelLength, GroupLayout.PREFERRED_SIZE)
-																.addComponent(panelAltbauUnten,
-																		GroupLayout.PREFERRED_SIZE, panelLength,
-																		GroupLayout.PREFERRED_SIZE)
-																.addComponent(panelAltbauOben,
-																		GroupLayout.PREFERRED_SIZE, panelLength,
-																		GroupLayout.PREFERRED_SIZE))
-												.addGroup(
-														layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-																.addComponent(panelClass, GroupLayout.PREFERRED_SIZE,
-																		panelLength, GroupLayout.PREFERRED_SIZE)
-																.addComponent(panelHallen, GroupLayout.PREFERRED_SIZE,
-																		panelLength, GroupLayout.PREFERRED_SIZE)
-																.addComponent(panelKeller, GroupLayout.PREFERRED_SIZE,
-																		panelLength, GroupLayout.PREFERRED_SIZE)))
-								.addComponent(panelTeacher)));
+				.addGroup(layout.createBaselineGroup(false, true)
+						.addGroup(layout.createSequentialGroup()
+								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+										.addComponent(panelDayOfWeek, GroupLayout.PREFERRED_SIZE, panelLength,
+												GroupLayout.PREFERRED_SIZE)
+								.addComponent(panelNeubauUnten, GroupLayout.PREFERRED_SIZE, panelLength,
+										GroupLayout.PREFERRED_SIZE).addComponent(panelNeubauOben,
+												GroupLayout.PREFERRED_SIZE, panelLength, GroupLayout.PREFERRED_SIZE))
+								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+										.addComponent(panelHour, GroupLayout.PREFERRED_SIZE, panelLength,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(panelAltbauUnten, GroupLayout.PREFERRED_SIZE, panelLength,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(panelAltbauOben, GroupLayout.PREFERRED_SIZE, panelLength,
+												GroupLayout.PREFERRED_SIZE))
+								.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+										.addComponent(panelClass, GroupLayout.PREFERRED_SIZE, panelLength,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(panelHallen, GroupLayout.PREFERRED_SIZE, panelLength,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(panelKeller, GroupLayout.PREFERRED_SIZE, panelLength,
+												GroupLayout.PREFERRED_SIZE)))
+						.addComponent(panelTeacher)));
 	}
 
 	@Override
@@ -393,26 +294,26 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		// teacher list
 		JPanel panelTeacher = new JPanel(new GridLayout(1, 0));
 		panelTeacher.setBorder(BorderFactory.createTitledBorder("Lehrer"));
-		final JList<String> teacherList = createTeacherNameList();
-		JScrollPane scrollPaneTeacherList = new JScrollPane(teacherList);
+		teacherList2 = createTeacherNameList();
+		JScrollPane scrollPaneTeacherList = new JScrollPane(teacherList2);
 		panelTeacher.add(scrollPaneTeacherList);
-		teacherList.addListSelectionListener(new ListSelectionListener() {
+		teacherList2.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
 				if (!evt.getValueIsAdjusting()) {
 					for (Teacher teacher : model.getTeachers()) {
-						if (teacher.getAbbr().equals(teacherList.getSelectedValue().split(" ")[0])) {
+						if (teacher.getAbbr().equals(teacherList2.getSelectedValue().split(" ")[0])) {
 							controller.setSelectedTeacher(teacher);
 							showText(
 									"Lehrerstundenplan f\u00fcr " + teacher.getSurname() + ", "
-											+ teacher.getFirstname(), teacher.getTimeTableText(),
-									"F\u00fcr " + teacher.getSurname() + ", " + teacher.getFirstname()
-											+ " ist leider kein Stundenplan vorhanden.");
+											+ teacher.getFirstname(),
+									teacher.getTimeTableText(), "F\u00fcr " + teacher.getSurname() + ", "
+											+ teacher.getFirstname() + " ist leider kein Stundenplan vorhanden.");
 						}
 					}
 				}
 			}
 		});
-		teacherList.addMouseListener(new PopClickListener());
+		teacherList2.addMouseListener(new PopClickListener());
 
 		// Class list
 		JPanel panelClass = new JPanel(new GridLayout(1, 0));
@@ -479,16 +380,14 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		});
 		roomList.addMouseListener(new PopClickListener());
 
-		layout.setHorizontalGroup(layout
-				.createSequentialGroup()
+		layout.setHorizontalGroup(layout.createSequentialGroup()
 				.addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE, panelTeacher.getPreferredSize().width,
 						GroupLayout.PREFERRED_SIZE)
 				.addContainerGap()
 				.addComponent(panelClass, GroupLayout.PREFERRED_SIZE, panelClass.getPreferredSize().width + 20,
 						GroupLayout.PREFERRED_SIZE)
-				.addContainerGap()
-				.addComponent(panelRoom, GroupLayout.PREFERRED_SIZE, panelRoom.getPreferredSize().width + 20,
-						GroupLayout.PREFERRED_SIZE));
+				.addContainerGap().addComponent(panelRoom, GroupLayout.PREFERRED_SIZE,
+						panelRoom.getPreferredSize().width + 20, GroupLayout.PREFERRED_SIZE));
 
 		layout.setVerticalGroup(layout.createParallelGroup()
 				.addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE, screenHeight, GroupLayout.PREFERRED_SIZE)
@@ -570,31 +469,23 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 			textArea.setText(title + "\r\n" + text);
 		JScrollPane textAreaScrollPane = new JScrollPane(textArea);
 
-		layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(
-				layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addComponent(label)
-						.addComponent(textAreaScrollPane, GroupLayout.PREFERRED_SIZE,
-								textAreaScrollPane.getPreferredSize().width + 20, GroupLayout.PREFERRED_SIZE)));
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(label).addComponent(
+						textAreaScrollPane, GroupLayout.PREFERRED_SIZE,
+						textAreaScrollPane.getPreferredSize().width + 20, GroupLayout.PREFERRED_SIZE)));
 
-		layout.setVerticalGroup(layout
-				.createSequentialGroup()
-				.addComponent(label)
-				.addComponent(textAreaScrollPane, GroupLayout.PREFERRED_SIZE, screenHeight - 10,
-						GroupLayout.PREFERRED_SIZE));
+		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(label).addComponent(textAreaScrollPane,
+				GroupLayout.PREFERRED_SIZE, screenHeight - 10, GroupLayout.PREFERRED_SIZE));
 	}
 
 	@Override
 	public void update() {
 		updateAllRoomAllocation();
-		// updateUpz();
-	}
-
-	@Override
-	public void updateUpz() {
 		Teacher selectedTeacher = model.getSelectedTeacher();
 		if (selectedTeacher != null) {
-			teacherSpmList.setListData(selectedTeacher.getTeacherSpmText());
-			teacherDataList.setListData(selectedTeacher.getTeacherData());
+			int selectionIndex = teacherListMap.get(selectedTeacher);
+			// teacherList2.setSelectedIndex(selectionIndex);
+			teacherList1.setSelectedIndex(selectionIndex);
 		}
 	}
 
@@ -653,196 +544,102 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		roomLabel.setText(labelText);
 	}
 
-	public class PopClickListener extends MouseAdapter {
+	public JPopupMenu createPopUpMenu(final MouseEvent e) {
+		popupMenu = super.createPopUpMenu(e);
+		final Room selectedRoom = model.getSelectedRoom();
+		final Teacher selectedTeacher = model.getSelectedTeacher();
+		final SchoolClass selectedClass = model.getSelectedClass();
 
-		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger())
-				doPop(e);
-		}
-
-		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger())
-				doPop(e);
-		}
-
-		private void doPop(final MouseEvent e) {
-			popupMenu = new JPopupMenu();
-			final Room selectedRoom = model.getSelectedRoom();
-			final Teacher selectedTeacher = model.getSelectedTeacher();
-			final SchoolClass selectedClass = model.getSelectedClass();
-
-			if (selectedRoom != null) {
-				JMenuItem selectedRoomItem = new JMenuItem("Raumplan f\u00fcr Raum " + selectedRoom.getName());
-				popupMenu.add(selectedRoomItem);
-				selectedRoomItem.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						showText("Belegungsplan f\u00fcr Raum " + selectedRoom.getName(),
-								selectedRoom.getRoomAllocationText(),
-								"F\u00fcr diesen Raum wurde leider kein Eintrag gefunden.");
-					}
-				});
-
-				selectedRoomTeacher = model.getRoomAllocationTeacher(selectedRoom.getName());
-				if (selectedRoomTeacher != null) {
-					final String firstnameAbbr = selectedRoomTeacher.getFirstname().substring(0, 1) + ".";
-					JMenuItem selectedRoomTeacherItem = new JMenuItem("Lehrerstundenplan f\u00fcr "
-							+ selectedRoomTeacher.getSurname() + ", " + firstnameAbbr + " (in Raum "
-							+ selectedRoom.getName() + ")");
-					popupMenu.add(selectedRoomTeacherItem);
-					selectedRoomTeacherItem.addActionListener(new ActionListener() {
-
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							showText("Lehrerstundenplan f\u00fcr " + selectedRoomTeacher.getSurname() + ", "
-									+ firstnameAbbr, selectedRoomTeacher.getTimeTableText(), "F\u00fcr "
-									+ selectedRoomTeacher.getSurname() + ", " + firstnameAbbr
-									+ " ist leider kein Stundenplan vorhanden.");
-
-						}
-
-					});
-				}
-			}
-
-			if (selectedTeacher != null && !selectedTeacher.equals(selectedRoomTeacher)) {
-				final String firstnameAbbr = selectedTeacher.getFirstname().substring(0, 1) + ".";
-				JMenuItem selectedTeacherButton = new JMenuItem("Lehrerstundenplan f\u00fcr "
-						+ selectedTeacher.getSurname() + ", " + firstnameAbbr);
-				popupMenu.add(selectedTeacherButton);
-				selectedTeacherButton.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						showText("Lehrerstundenplan f\u00fcr " + selectedTeacher.getSurname() + ", " + firstnameAbbr,
-								selectedTeacher.getTimeTableText(), "F\u00fcr " + selectedTeacher.getSurname() + ", "
-										+ firstnameAbbr + " ist leider kein Stundenplan vorhanden.");
-
-					}
-				});
-			}
-
-			if (selectedClass != null) {
-				JMenuItem selectedClassItem = new JMenuItem("Stundenplan f\u00fcr Klasse " + selectedClass.getName());
-				popupMenu.add(selectedClassItem);
-				selectedClassItem.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						showText("Stundenplan f\u00fcr Klasse " + selectedClass.getName(),
-								selectedClass.getTimeTableText(),
-								"F\u00fcr diese Klasse wurde leider kein Stundenplan gefunden.");
-					}
-				});
-
-			}
-
-			JMenuItem showRoomAllocationItem = new JMenuItem("\u00dcbersicht Raumbelegung "
-					+ model.getSelectedDayName() + ", Stunde " + model.getSelectedHour());
-			popupMenu.add(showRoomAllocationItem);
-			showRoomAllocationItem.addActionListener(new ActionListener() {
+		if (selectedRoom != null) {
+			JMenuItem selectedRoomItem = new JMenuItem("Raumplan f\u00fcr Raum " + selectedRoom.getName());
+			popupMenu.add(selectedRoomItem);
+			selectedRoomItem.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					showText(
-							"\u00dcbersicht Raumbelegung " + model.getSelectedDayName() + ", Stunde "
-									+ model.getSelectedHour(), showRoomAllocation(),
-							"Die \u00dcbersicht zur Raumbelegung konnte leider nicht erstellt werden.");
+					showText("Belegungsplan f\u00fcr Raum " + selectedRoom.getName(),
+							selectedRoom.getRoomAllocationText(),
+							"F\u00fcr diesen Raum wurde leider kein Eintrag gefunden.");
 				}
 			});
-			JMenuItem printItem = new JMenuItem("Ansicht drucken");
-			popupMenu.add(printItem);
-			printItem.addActionListener(new ActionListener() {
+
+			selectedRoomTeacher = model.getRoomAllocationTeacher(selectedRoom.getName());
+			if (selectedRoomTeacher != null) {
+				final String firstnameAbbr = selectedRoomTeacher.getFirstname().substring(0, 1) + ".";
+				JMenuItem selectedRoomTeacherItem = new JMenuItem(
+						"Lehrerstundenplan f\u00fcr " + selectedRoomTeacher.getSurname() + ", " + firstnameAbbr
+								+ " (in Raum " + selectedRoom.getName() + ")");
+				popupMenu.add(selectedRoomTeacherItem);
+				selectedRoomTeacherItem.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						showText(
+								"Lehrerstundenplan f\u00fcr " + selectedRoomTeacher.getSurname() + ", " + firstnameAbbr,
+								selectedRoomTeacher.getTimeTableText(), "F\u00fcr " + selectedRoomTeacher.getSurname()
+										+ ", " + firstnameAbbr + " ist leider kein Stundenplan vorhanden.");
+
+					}
+
+				});
+			}
+		}
+
+		if (selectedTeacher != null && !selectedTeacher.equals(selectedRoomTeacher)) {
+			final String firstnameAbbr = selectedTeacher.getFirstname().substring(0, 1) + ".";
+			JMenuItem selectedTeacherButton = new JMenuItem(
+					"Lehrerstundenplan f\u00fcr " + selectedTeacher.getSurname() + ", " + firstnameAbbr);
+			popupMenu.add(selectedTeacherButton);
+			selectedTeacherButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showText("Lehrerstundenplan f\u00fcr " + selectedTeacher.getSurname() + ", " + firstnameAbbr,
+							selectedTeacher.getTimeTableText(), "F\u00fcr " + selectedTeacher.getSurname() + ", "
+									+ firstnameAbbr + " ist leider kein Stundenplan vorhanden.");
+
+				}
+			});
+		}
+
+		if (selectedClass != null) {
+			JMenuItem selectedClassItem = new JMenuItem("Stundenplan f\u00fcr Klasse " + selectedClass.getName());
+			popupMenu.add(selectedClassItem);
+			selectedClassItem.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					print(cards);
+					showText("Stundenplan f\u00fcr Klasse " + selectedClass.getName(), selectedClass.getTimeTableText(),
+							"F\u00fcr diese Klasse wurde leider kein Stundenplan gefunden.");
 				}
 			});
 
-			if (e.getSource() instanceof JTextArea) {
-				JMenuItem openTextItem = new JMenuItem("Text in Editor \u00F6ffnen");
-				final JTextArea textArea = (JTextArea) e.getSource();
-				popupMenu.add(openTextItem);
-				openTextItem.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-
-						PrintWriter w;
-
-						try {
-							File datei = File.createTempFile("plan", ".txt");
-							w = new PrintWriter(new BufferedWriter(new FileWriter(datei)));
-
-							w.print(textArea.getText());
-							w.flush();
-							w.close();
-
-							Desktop.getDesktop().open(datei);
-							datei.deleteOnExit();
-
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				});
-				
-				JMenuItem printTextItem = new JMenuItem("Text drucken");
-				popupMenu.add(printTextItem);
-				printTextItem.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-
-						PrintWriter w;
-
-						try {
-							File datei = File.createTempFile("plan", ".txt");
-							w = new PrintWriter(new BufferedWriter(
-									new FileWriter(datei)));
-
-							w.print(textArea.getText());
-							w.flush();
-							w.close();
-							
-							int printFontSize = Math.round(5800/textArea.getWidth());
-							Font printFont = new Font("monospaced", Font.PLAIN, printFontSize);
-							textArea.setFont(printFont);							
-							textArea.print();							
-							textArea.setFont(monospacedFont);
-						
-							datei.deleteOnExit();
-
-						} catch (IOException | PrinterException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-			popupMenu.show(e.getComponent(), e.getX(), e.getY());
 		}
-	}
 
-	@Override
-	public void print(Component toPrint) {
-		PrinterJob pjob = PrinterJob.getPrinterJob();
-		// Set print component
-		PageFormat pf = pjob.defaultPage();
-		pf.setOrientation(PageFormat.LANDSCAPE);
-		pjob.setPrintable(new Printer(toPrint), pf);
-		pjob.setJobName("GSH_" + model.getSelectedDayName() + "_Stunde_" + model.getSelectedHour());
-		if (pjob.printDialog()) {
-			try {
-				pjob.print();
-			} catch (PrinterException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		JMenuItem showRoomAllocationItem = new JMenuItem(
+				"\u00dcbersicht Raumbelegung " + model.getSelectedDayName() + ", Stunde " + model.getSelectedHour());
+		popupMenu.add(showRoomAllocationItem);
+		showRoomAllocationItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				showText(
+						"\u00dcbersicht Raumbelegung " + model.getSelectedDayName() + ", Stunde "
+								+ model.getSelectedHour(),
+						showRoomAllocation(),
+						"Die \u00dcbersicht zur Raumbelegung konnte leider nicht erstellt werden.");
 			}
-		}
+		});
+
+		JMenuItem printItem = new JMenuItem("Ansicht drucken");
+		popupMenu.add(printItem);
+		printItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				print(cards, "GSH_" + model.getSelectedDayName() + "_Stunde_" + model.getSelectedHour());
+			}
+		});
+		return (popupMenu);
 	}
 
 	@Override
@@ -863,9 +660,8 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 					teacherName += roomAllocationTeacher.getSurname() + ", " + roomAllocationTeacher.getFirstname();
 				}
 				roomAllocation += "| " + roomName + whitespaceCalc(7, roomName.length()) + "| " + schoolClass
-						+ whitespaceCalc(8, schoolClass.length()) + "| " + subject
-						+ whitespaceCalc(7, subject.length()) + "| " + teacherName
-						+ whitespaceCalc(25, teacherName.length()) + "| \r\n"
+						+ whitespaceCalc(8, schoolClass.length()) + "| " + subject + whitespaceCalc(7, subject.length())
+						+ "| " + teacherName + whitespaceCalc(25, teacherName.length()) + "| \r\n"
 						+ "+--------+---------+--------+--------------------------+\r\n";
 			}
 
