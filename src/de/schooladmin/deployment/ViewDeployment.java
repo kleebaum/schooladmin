@@ -172,7 +172,6 @@ public class ViewDeployment extends View implements ViewDeploymentInterface, Tab
 		teacherTable.setFont(bigFont);
 		teacherTable.setAutoCreateColumnsFromModel(true);
 		teacherTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		teacherTable.addMouseListener(popClickListener);
 		teacherTable.addMouseListener(new MouseAdapter() {
 
 			@Override

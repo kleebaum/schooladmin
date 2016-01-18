@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -297,18 +298,16 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		teacherList2 = createTeacherNameList();
 		JScrollPane scrollPaneTeacherList = new JScrollPane(teacherList2);
 		panelTeacher.add(scrollPaneTeacherList);
-		teacherList2.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evt) {
-				if (!evt.getValueIsAdjusting()) {
-					for (Teacher teacher : model.getTeachers()) {
-						if (teacher.getAbbr().equals(teacherList2.getSelectedValue().split(" ")[0])) {
-							controller.setSelectedTeacher(teacher);
-							showText(
-									"Lehrerstundenplan f\u00fcr " + teacher.getSurname() + ", "
-											+ teacher.getFirstname(),
-									teacher.getTimeTableText(), "F\u00fcr " + teacher.getSurname() + ", "
-											+ teacher.getFirstname() + " ist leider kein Stundenplan vorhanden.");
-						}
+		teacherList2.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent mouseEvent) {
+				for (Teacher teacher : model.getTeachers()) {
+					if (teacher.getAbbr().equals(teacherList2.getSelectedValue().split(" ")[0])) {
+						controller.setSelectedTeacher(teacher);
+						showText(
+								"Lehrerstundenplan f\u00fcr " + teacher.getSurname() + ", "
+										+ teacher.getFirstname(),
+								teacher.getTimeTableText(), "F\u00fcr " + teacher.getSurname() + ", "
+										+ teacher.getFirstname() + " ist leider kein Stundenplan vorhanden.");
 					}
 				}
 			}
@@ -331,16 +330,14 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		JScrollPane scrollPaneClassList = new JScrollPane(classList);
 		panelClass.add(scrollPaneClassList);
 
-		classList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evt) {
-				if (!evt.getValueIsAdjusting()) {
-					for (SchoolClass schoolClass : model.getClasses()) {
-						if (schoolClass.getName().equals(classList.getSelectedValue())) {
-							controller.setSelectedClass(schoolClass);
-							showText("Stundenplan f\u00fcr Klasse " + schoolClass.getName(),
-									schoolClass.getTimeTableText(),
-									"F\u00fcr diese Klasse wurde leider kein Stundenplan gefunden.");
-						}
+		classList.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent mouseEvent) {
+				for (SchoolClass schoolClass : model.getClasses()) {
+					if (schoolClass.getName().equals(classList.getSelectedValue())) {
+						controller.setSelectedClass(schoolClass);
+						showText("Stundenplan f\u00fcr Klasse " + schoolClass.getName(),
+								schoolClass.getTimeTableText(),
+								"F\u00fcr diese Klasse wurde leider kein Stundenplan gefunden.");
 					}
 				}
 			}
@@ -364,20 +361,19 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 
 		JScrollPane scrollPaneRoomList = new JScrollPane(roomList);
 		panelRoom.add(scrollPaneRoomList);
-
-		roomList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evt) {
-				if (!evt.getValueIsAdjusting()) {
-					for (Room room : model.getRooms()) {
-						if (room.getName().equals(roomList.getSelectedValue())) {
-							controller.setSelectedRoom(room);
-							showText("Stundenplan f\u00fcr Raum " + room.getName(), room.getRoomAllocationText(),
-									"F\u00fcr diesen Raum wurde leider kein Stundenplan gefunden.");
-						}
+		
+		roomList.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent mouseEvent) {
+				for (Room room : model.getRooms()) {
+					if (room.getName().equals(roomList.getSelectedValue())) {
+						controller.setSelectedRoom(room);
+						showText("Stundenplan f\u00fcr Raum " + room.getName(), room.getRoomAllocationText(),
+								"F\u00fcr diesen Raum wurde leider kein Stundenplan gefunden.");
 					}
 				}
 			}
 		});
+
 		roomList.addMouseListener(new PopClickListener());
 
 		layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -484,7 +480,7 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		Teacher selectedTeacher = model.getSelectedTeacher();
 		if (selectedTeacher != null) {
 			int selectionIndex = teacherListMap.get(selectedTeacher);
-			// teacherList2.setSelectedIndex(selectionIndex);
+			teacherList2.setSelectedIndex(selectionIndex);
 			teacherList1.setSelectedIndex(selectionIndex);
 		}
 	}

@@ -6,7 +6,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Class for teachers
@@ -24,16 +29,31 @@ public class Teacher {
 	private double toDo; // Sollstunden
 	private double actDo; // aktueller Einsatz
 	private String schoolType;
+	// public ArrayList<String> schoolTypeList;
 	private String subjects;
 	private ArrayList<SchoolGroup> schoolGroups;
-	
+
 	private BufferedReader in;
 
 	// private enum schooltype {R, G, H};
 	private String[] teacherSpmText;
 	private String timeTableText;
-	private String[] teacherData;
+	private ArrayList<String> teacherData;
 	private String timestamp;
+
+	public double partTime;
+	public double workAccount;
+	public double scientificTime;
+	public double handicapTime;
+	public double seniorReduction;
+	public double compensateMidTerm;
+	public double compensateYear;
+	public double plusMinus;
+	public double directorTime;
+	public double committeTime;
+	public double functionTime;
+	public String teachingTimeText;
+	public double otherTimeDif;
 
 	public Teacher(String surname, String firstname, String abbr) {
 		this.surname = surname;
@@ -41,28 +61,28 @@ public class Teacher {
 		this.abbr = abbr;
 		this.toDo = 0;
 		this.actDo = 0;
-		this.schoolType = "Schultyp fehlt";		
+		this.schoolType = "Schultyp fehlt";
+		this.teacherData = new ArrayList<String>();
 	}
-	
+
 	public Teacher(String surname, String firstname, String abbr, String gender, String birthday, int toDo) {
 		this(surname, firstname, abbr);
 		this.gender = gender;
 		this.birthday = birthday;
 		this.toDo = toDo;
 	}
-	
+
 	public Teacher(String surname, String firstname, String abbr, String fileName) {
 		this(surname, firstname, abbr);
 		this.timeTableText = readTeacherTimeTableTextFromFile(fileName);
 		this.teacherSpmText = readTeacherSpmTextFromFile(fileName);
 	}
-	
+
 	private String readTeacherTimeTableTextFromFile(String fileName) {
 		String timeTableText = "";
 		boolean foundRoom = false;
 		try {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName),
-					StandardCharsets.ISO_8859_1));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1));
 			String zeile = null;
 			while ((zeile = in.readLine()) != null) {
 				if (foundRoom == true) {
@@ -77,9 +97,9 @@ public class Teacher {
 				try {
 					firstnameAbbr += this.firstname.substring(0, 2);
 					nameLonger += name + " " + firstnameAbbr;
-					name += " " + firstnameAbbr.substring(0,1) + ".";
+					name += " " + firstnameAbbr.substring(0, 1) + ".";
 				} catch (StringIndexOutOfBoundsException e) {
-					
+
 				}
 
 				if (zeile.contains("Staatl.") && zeile.contains(nameLonger) || zeile.contains(name)) {
@@ -93,11 +113,11 @@ public class Teacher {
 			e.printStackTrace();
 		}
 		if (timeTableText.equals(""))
-			return(timeTableText);
-		return(this.timestamp +"\r\n" + timeTableText);
+			return (timeTableText);
+		return (this.timestamp + "\r\n" + timeTableText);
 	}
 
-	public String[] readTeacherSpmTextFromFile(String fileName){
+	public String[] readTeacherSpmTextFromFile(String fileName) {
 		boolean foundSpm = false;
 		ArrayList<String> spmArrayList = new ArrayList<String>();
 		try {
@@ -222,7 +242,7 @@ public class Teacher {
 	/**
 	 * @return the teacherData
 	 */
-	public String[] getTeacherData() {
+	public ArrayList<String> getTeacherData() {
 		return teacherData;
 	}
 
@@ -230,7 +250,7 @@ public class Teacher {
 	 * @param teacherData
 	 *            the teacherData to set
 	 */
-	public void setTeacherData(String[] teacherData) {
+	public void setTeacherData(ArrayList<String> teacherData) {
 		this.teacherData = teacherData;
 	}
 
@@ -250,7 +270,8 @@ public class Teacher {
 	}
 
 	/**
-	 * @param toDo the toDo to set
+	 * @param toDo
+	 *            the toDo to set
 	 */
 	public void setToDo(double toDo) {
 		this.toDo = toDo;
@@ -264,7 +285,8 @@ public class Teacher {
 	}
 
 	/**
-	 * @param subjects the subjects to set
+	 * @param subjects
+	 *            the subjects to set
 	 */
 	public void setSubjects(String subjects) {
 		this.subjects = subjects;
@@ -278,7 +300,8 @@ public class Teacher {
 	}
 
 	/**
-	 * @param schoolType the schoolType to set
+	 * @param schoolType
+	 *            the schoolType to set
 	 */
 	public void setSchoolType(String schoolType) {
 		this.schoolType = schoolType;
@@ -292,21 +315,24 @@ public class Teacher {
 	}
 
 	/**
-	 * @param actDo the actDo to set
+	 * @param actDo
+	 *            the actDo to set
 	 */
 	public void setActDo(double actDo) {
 		this.actDo = actDo;
 	}
-	
+
 	/**
-	 * @param subtract from actual done hours
+	 * @param subtract
+	 *            from actual done hours
 	 */
 	public void subtractFromActDo(double value) {
 		this.actDo -= value;
 	}
-	
+
 	/**
-	 * @param add to actual done hours
+	 * @param add
+	 *            to actual done hours
 	 */
 	public void addToActDo(double value) {
 		this.actDo += value;
@@ -320,14 +346,79 @@ public class Teacher {
 	}
 
 	/**
-	 * @param schoolGroups the schoolGroups to set
+	 * @param schoolGroups
+	 *            the schoolGroups to set
 	 */
 	public void setSchoolGroups(ArrayList<SchoolGroup> schoolGroups) {
 		this.schoolGroups = schoolGroups;
 	}
-	
+
 	public void initSchoolGroups() {
 		this.schoolGroups = new ArrayList<SchoolGroup>();
 	}
+
+	public int getAge() {
+		Date date = new Date();
+		Calendar now = Calendar.getInstance();
+		now.setTime(date);
+
+		Calendar born = Calendar.getInstance();
+		if (!this.birthday.equals("")) {
+
+			Date birthdayDate = new Date();
+			DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+			try {
+				birthdayDate = format.parse(this.birthday);
+				born.setTime(birthdayDate);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			int age = now.get(Calendar.YEAR) - born.get(Calendar.YEAR);
+			if (born.get(Calendar.MONTH) > now.get(Calendar.MONTH)
+					|| (born.get(Calendar.MONTH) == now.get(Calendar.MONTH)
+							&& born.get(Calendar.DATE) > now.get(Calendar.DATE))) {
+				age--;
+			}
+			return age;
+		}
+		return 0;
+	}
+
+	public int getSchoolAge() {
+		int age = this.getAge();
+
+		DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+		Date date = new Date();
+		Calendar now = Calendar.getInstance();
+		now.setTime(date);	
+
+		Calendar born = Calendar.getInstance();
+		if (!this.birthday.equals("")) {
+
+			Date birthdayDate = new Date();
+			
+			try {
+				birthdayDate = format.parse(this.birthday);
+				born.setTime(birthdayDate);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (now.get(Calendar.MONTH) > 1 && now.get(Calendar.MONTH) < 8 && born.get(Calendar.MONTH) > 1
+					&& born.get(Calendar.MONTH) < 8) {
+				System.out.println("hier");
+				age--;
+			}			
+		}
+		return age;
+	}
+
+	// public ArrayList<String> getSchoolTypeList() {
+	// ArrayList<String> schoolTypeList = new ArrayList<String>();
+	// for (String schoolType : this.schoolType.split(" "))
+	// schoolTypeList.add(schoolType);
+	// return schoolTypeList;
+	// }
 
 }

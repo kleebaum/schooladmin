@@ -141,7 +141,7 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 		header.add("Vorname");
 		header.add("Abk");
 		header.add("Geb.Datum");
-		ParserInterface nameListParser = new Parser(fileTeachers, "[\\s]*;[\\s]*", StandardCharsets.ISO_8859_1, 1, header);
+		ParserInterface nameListParser = new Parser(fileTeachers, "[\\s]*;|,[\\s]*", StandardCharsets.ISO_8859_1, 1, header);
 		try {
 			nameListParser.processLineByLine();
 		} catch (IOException e) {

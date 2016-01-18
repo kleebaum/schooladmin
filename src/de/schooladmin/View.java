@@ -144,68 +144,68 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 	@Override
 	public void exitProgram() {
-		final JFrame frame = new JFrame("Programm " + model.getName() + " verlassen?");
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setIconImage(((ImageIcon) icon).getImage());
-
-		// add content
-		JLabel lab = new JLabel(icon);
-		frame.getContentPane().add(lab, "West");
-
-		Box box = Box.createVerticalBox();
-		box.add(Box.createGlue());
-		box.add(new JLabel("Wollen Sie das Programm " + model.getName() + " verlassen?"));
-		box.add(Box.createGlue());
-		frame.getContentPane().add(box, "East");
-
-		JPanel p2 = new JPanel();
-		JButton ok = new JButton("Ja");
-		JButton cancel = new JButton("Abbrechen");
-		p2.add(ok);
-		p2.add(cancel);
-		frame.getContentPane().add(p2, "South");
-
-		ok.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				viewFrame.dispose();
-				frame.dispose();
-			}
-		});
-
-		cancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				frame.dispose();
-			}
-		});
-
-		// display the window
-		frame.setLocation(screenWidth / 2 - 50, screenHeight / 2 - 50);
-		frame.pack();
-		frame.setVisible(true);
+//		final JFrame frame = new JFrame("Programm " + model.getName() + " verlassen?");
+//		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		frame.setIconImage(((ImageIcon) icon).getImage());
+//
+//		// add content
+//		JLabel lab = new JLabel(icon);
+//		frame.getContentPane().add(lab, "West");
+//
+//		Box box = Box.createVerticalBox();
+//		box.add(Box.createGlue());
+//		box.add(new JLabel("Wollen Sie das Programm " + model.getName() + " verlassen?"));
+//		box.add(Box.createGlue());
+//		frame.getContentPane().add(box, "East");
+//
+//		JPanel p2 = new JPanel();
+//		JButton ok = new JButton("Ja");
+//		JButton cancel = new JButton("Abbrechen");
+//		p2.add(ok);
+//		p2.add(cancel);
+//		frame.getContentPane().add(p2, "South");
+//
+//		ok.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				viewFrame.dispose();
+//				frame.dispose();
+//			}
+//		});
+//
+//		cancel.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				frame.dispose();
+//			}
+//		});
+//
+//		// display the window
+//		frame.setLocation(screenWidth / 2 - 50, screenHeight / 2 - 50);
+//		frame.pack();
+//		frame.setVisible(true);
 	}
 
 	@Override
 	public void loadingFrame() {
-		 if (loadingFrame == null) {
-		
-		 loadingFrame = new JFrame();
-		 loadingFrame.setUndecorated(true);
-		 loadingFrame.setContentPane(new JLabel(splash));
-		
-		 loadingFrame.setSize(splash.getIconWidth(), splash.getIconHeight());
-		 loadingFrame.setLocationRelativeTo(null);
-		 loadingFrame.pack();
-		 }
-		 if (loadingFrame.isVisible()) {
-		 try {
-		 Thread.sleep(2000);
-		 } catch (InterruptedException e) {
-		 e.printStackTrace();
-		 }
-		 loadingFrame.setVisible(false);
-		 } else {
-		 loadingFrame.setVisible(true);
-		 }
+//		if (loadingFrame == null) {
+//
+//			loadingFrame = new JFrame();
+//			loadingFrame.setUndecorated(true);
+//			loadingFrame.setContentPane(new JLabel(splash));
+//
+//			loadingFrame.setSize(splash.getIconWidth(), splash.getIconHeight());
+//			loadingFrame.setLocationRelativeTo(null);
+//			loadingFrame.pack();
+//		}
+//		if (loadingFrame.isVisible()) {
+//			try {
+//				Thread.sleep(2000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			loadingFrame.setVisible(false);
+//		} else {
+//			loadingFrame.setVisible(true);
+//		}
 	}
 
 	@Override
@@ -303,39 +303,39 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 	@Override
 	public void errorWindow(String message) {
-		 final JFrame frame = new JFrame("Fehlermeldung");
-		 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		 frame.setIconImage(((ImageIcon) icon).getImage());
-		
-		 // add content
-		 JLabel lab = new JLabel(icon);
-		 frame.getContentPane().add(lab, "West");
-		
-		 Box box = Box.createVerticalBox();
-		 box.add(Box.createGlue());
-		 box.add(new JLabel(" " + message));
-		 box.add(Box.createGlue());
-		 frame.getContentPane().add(box, "East");
-		
-		 JPanel p2 = new JPanel();
-		 JButton ok = new JButton("OK");
-		 p2.add(ok);
-		 frame.getContentPane().add(p2, "South");
-		
-		 ok.addActionListener(new ActionListener() {
-		 public void actionPerformed(ActionEvent evt) {
-		 frame.setVisible(false);
-		 controller.setError("");
-		 errorWindow = false;
-		 }
-		 });
-		
-		 errorWindow = true;
-		
-		 // display the window
-		 frame.setLocation(screenWidth/2-50, screenHeight/2-50);
-		 frame.pack();
-		 frame.setVisible(true);
+//		final JFrame frame = new JFrame("Fehlermeldung");
+//		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		frame.setIconImage(((ImageIcon) icon).getImage());
+//
+//		// add content
+//		JLabel lab = new JLabel(icon);
+//		frame.getContentPane().add(lab, "West");
+//
+//		Box box = Box.createVerticalBox();
+//		box.add(Box.createGlue());
+//		box.add(new JLabel(" " + message));
+//		box.add(Box.createGlue());
+//		frame.getContentPane().add(box, "East");
+//
+//		JPanel p2 = new JPanel();
+//		JButton ok = new JButton("OK");
+//		p2.add(ok);
+//		frame.getContentPane().add(p2, "South");
+//
+//		ok.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				frame.setVisible(false);
+//				controller.setError("");
+//				errorWindow = false;
+//			}
+//		});
+//
+//		errorWindow = true;
+//
+//		// display the window
+//		frame.setLocation(screenWidth / 2 - 50, screenHeight / 2 - 50);
+//		frame.pack();
+//		frame.setVisible(true);
 	}
 
 	@Override
@@ -401,7 +401,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void print(Component toPrint, String name) {
 		PrinterJob pjob = PrinterJob.getPrinterJob();
@@ -419,7 +419,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 			}
 		}
 	}
-	
+
 	@Override
 	public JPopupMenu createPopUpMenu(final MouseEvent e) {
 		popupMenu = new JPopupMenu();
@@ -488,6 +488,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
+					System.out.println(textArea.getWidth());
 
 					PrintWriter w;
 
@@ -498,8 +499,13 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 						w.print(textArea.getText());
 						w.flush();
 						w.close();
-
-						int printFontSize = Math.round(5800 / textArea.getWidth());
+						
+						int printFontSize = 9;
+						
+						if (textArea.getWidth() > 600) {
+							printFontSize = Math.round(5800 / textArea.getWidth());
+						}
+						
 						Font printFont = new Font("monospaced", Font.PLAIN, printFontSize);
 						textArea.setFont(printFont);
 						textArea.print();
@@ -514,7 +520,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 				}
 			});
 		}
-		return(popupMenu);
+		return (popupMenu);
 	}
 
 	public class PopClickListener extends MouseAdapter {
