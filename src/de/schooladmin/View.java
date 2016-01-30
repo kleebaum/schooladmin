@@ -22,12 +22,11 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,7 +35,7 @@ import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -46,13 +45,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 
 public class View extends JFrame implements ObserverInterface, ViewInterface {
 
@@ -144,68 +141,59 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 	@Override
 	public void exitProgram() {
-//		final JFrame frame = new JFrame("Programm " + model.getName() + " verlassen?");
-//		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//		frame.setIconImage(((ImageIcon) icon).getImage());
-//
-//		// add content
-//		JLabel lab = new JLabel(icon);
-//		frame.getContentPane().add(lab, "West");
-//
-//		Box box = Box.createVerticalBox();
-//		box.add(Box.createGlue());
-//		box.add(new JLabel("Wollen Sie das Programm " + model.getName() + " verlassen?"));
-//		box.add(Box.createGlue());
-//		frame.getContentPane().add(box, "East");
-//
-//		JPanel p2 = new JPanel();
-//		JButton ok = new JButton("Ja");
-//		JButton cancel = new JButton("Abbrechen");
-//		p2.add(ok);
-//		p2.add(cancel);
-//		frame.getContentPane().add(p2, "South");
-//
-//		ok.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent evt) {
-//				viewFrame.dispose();
-//				frame.dispose();
-//			}
-//		});
-//
-//		cancel.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent evt) {
-//				frame.dispose();
-//			}
-//		});
-//
-//		// display the window
-//		frame.setLocation(screenWidth / 2 - 50, screenHeight / 2 - 50);
-//		frame.pack();
-//		frame.setVisible(true);
+		final JFrame frame = window("Programm " + model.getName() + " verlassen? ");
+
+		Box box = Box.createVerticalBox();
+		box.add(Box.createGlue());
+		box.add(new JLabel(" Wollen Sie " + model.getName() + " verlassen? "));
+		box.add(Box.createGlue());
+		frame.getContentPane().add(box, "East");
+
+		JPanel p2 = new JPanel();
+		JButton ok = new JButton("Ja");
+		JButton cancel = new JButton("Abbrechen");
+		p2.add(ok);
+		p2.add(cancel);
+		frame.getContentPane().add(p2, "South");
+
+		ok.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				viewFrame.dispose();
+				frame.dispose();
+			}
+		});
+
+		cancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				frame.dispose();
+			}
+		});
+		
+		frame.pack();	
 	}
 
 	@Override
 	public void loadingFrame() {
-//		if (loadingFrame == null) {
-//
-//			loadingFrame = new JFrame();
-//			loadingFrame.setUndecorated(true);
-//			loadingFrame.setContentPane(new JLabel(splash));
-//
-//			loadingFrame.setSize(splash.getIconWidth(), splash.getIconHeight());
-//			loadingFrame.setLocationRelativeTo(null);
-//			loadingFrame.pack();
-//		}
-//		if (loadingFrame.isVisible()) {
-//			try {
-//				Thread.sleep(2000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			loadingFrame.setVisible(false);
-//		} else {
-//			loadingFrame.setVisible(true);
-//		}
+		if (loadingFrame == null) {
+
+			loadingFrame = new JFrame();
+			loadingFrame.setUndecorated(true);
+			loadingFrame.setContentPane(new JLabel(splash));
+
+			loadingFrame.setSize(splash.getIconWidth(), splash.getIconHeight());
+			loadingFrame.setLocationRelativeTo(null);
+			loadingFrame.pack();
+		}
+		if (loadingFrame.isVisible()) {
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			loadingFrame.setVisible(false);
+		} else {
+			loadingFrame.setVisible(true);
+		}
 	}
 
 	@Override
@@ -267,14 +255,8 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 	@Override
 	public void helpWindow() {
-		final JFrame frame = new JFrame("\u00dcber " + model.getName());
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setIconImage(((ImageIcon) icon).getImage());
-
-		// add content
-		JLabel lab = new JLabel(icon);
-		frame.getContentPane().add(lab, "West");
-
+		final JFrame frame = window("\u00dcber " + model.getName());
+		
 		Box box = Box.createVerticalBox();
 		box.add(Box.createGlue());
 		box.add(new JLabel(" " + model.getName() + " "));
@@ -282,7 +264,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 		box.add(new JLabel(" Entwickelt von Anja Kleebaum "));
 		box.add(new JLabel(" Kontakt: Anja [dot] Kleebaum [at] Kleebaum [dot] de "));
 		box.add(Box.createGlue());
-		frame.getContentPane().add(box, "Center");
+		frame.getContentPane().add(box, "East");
 
 		JPanel p2 = new JPanel();
 		JButton ok = new JButton("OK");
@@ -293,23 +275,30 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 			public void actionPerformed(ActionEvent evt) {
 				frame.setVisible(false);
 			}
-		});
+		});		
+				
+		frame.pack();		
+	}
+	
+	@Override
+	public JFrame window(String title) {
+		final JFrame frame = new JFrame(title);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		ImageIcon icon = new ImageIcon(getClass().getResource("icon.png"));
+		frame.setIconImage(((ImageIcon) icon).getImage());
 
-		// display the window
+		JLabel lab = new JLabel(icon);
+		frame.getContentPane().add(lab, "West");		
+		
 		frame.setLocation(screenWidth / 2 - 50, screenHeight / 2 - 50);
-		frame.pack();
 		frame.setVisible(true);
+		
+		return frame;
 	}
 
 	@Override
 	public void errorWindow(String message) {
-//		final JFrame frame = new JFrame("Fehlermeldung");
-//		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//		frame.setIconImage(((ImageIcon) icon).getImage());
-//
-//		// add content
-//		JLabel lab = new JLabel(icon);
-//		frame.getContentPane().add(lab, "West");
+//		final JFrame frame = window("Fehlermeldung");
 //
 //		Box box = Box.createVerticalBox();
 //		box.add(Box.createGlue());
@@ -331,11 +320,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 //		});
 //
 //		errorWindow = true;
-//
-//		// display the window
-//		frame.setLocation(screenWidth / 2 - 50, screenHeight / 2 - 50);
 //		frame.pack();
-//		frame.setVisible(true);
 	}
 
 	@Override
@@ -345,7 +330,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 		ArrayList<String> resultArrayList = new ArrayList<String>();
 		int i = 0;
-		for (Teacher teacher : model.getTeachers()) {
+		for (Teacher teacher : model.getSchool().getTeachers()) {
 			teacherListMap.put(teacher, i);
 			resultArrayList.add(teacher.getAbbr() + " = " + teacher.getSurname() + ", " + teacher.getFirstname() + "");
 			i++;
@@ -354,7 +339,7 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 		teacherList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
 				if (!evt.getValueIsAdjusting()) {
-					for (Teacher teacher : model.getTeachers()) {
+					for (Teacher teacher : model.getSchool().getTeachers()) {
 						if (teacher.getAbbr().equals(teacherList.getSelectedValue().split(" ")[0])) {
 							controller.setSelectedTeacher(teacher);
 						}
@@ -365,41 +350,6 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 		String[] resultArray = resultArrayList.toArray(new String[resultArrayList.size()]);
 		teacherList.setListData(resultArray);
 		return teacherList;
-	}
-
-	@Override
-	public void exportTableDataToCVS(String folder, String fileName, String header, ArrayList<String> content,
-			boolean fileChooser) {
-		try {
-			final JFileChooser fc = new JFileChooser();
-
-			fc.setCurrentDirectory(new File(folder));
-			File file = new File(folder + fileName);
-			fc.setSelectedFile(file);
-			int retrival = JFileChooser.APPROVE_OPTION;
-			if (fileChooser) {
-				retrival = fc.showSaveDialog(null);
-			}
-			if (retrival == JFileChooser.APPROVE_OPTION) {
-				file = fc.getSelectedFile();
-				file.createNewFile();
-
-				BufferedWriter bw = new BufferedWriter(
-						(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.ISO_8859_1)));
-				bw.write(header);
-				bw.newLine();
-
-				for (int i = 0; i < content.size(); i++) {
-					bw.write(content.get(i));
-					bw.newLine();
-				}
-				bw.flush();
-				bw.close();
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -424,34 +374,34 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 	public JPopupMenu createPopUpMenu(final MouseEvent e) {
 		popupMenu = new JPopupMenu();
 
-		if (e.getSource() instanceof JTable) {
-			final JTable table = (JTable) e.getSource();
-			final DefaultTableModel model = (DefaultTableModel) table.getModel();
-
-			JMenuItem addColumnItem = new JMenuItem("Zeile am Tabellenende einf\u00fcgen");
-			popupMenu.add(addColumnItem);
-			addColumnItem.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					model.addRow(new Object[] { "", "", "" });
-				}
-			});
-
-			if (table.getSelectedRow() > 0) {
-
-				JMenuItem rmColumnItem = new JMenuItem("markierte Zeile l\u00f6schen");
-				popupMenu.add(rmColumnItem);
-				rmColumnItem.addActionListener(new ActionListener() {
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						model.removeRow(table.getSelectedRow());
-					}
-				});
-			}
-
-		}
+//		if (e.getSource() instanceof JTable) {
+//			final JTable table = (JTable) e.getSource();
+//			final DefaultTableModel model = (DefaultTableModel) table.getModel();
+//
+//			JMenuItem addColumnItem = new JMenuItem("Zeile am Tabellenende einf\u00fcgen");
+//			popupMenu.add(addColumnItem);
+//			addColumnItem.addActionListener(new ActionListener() {
+//
+//				@Override
+//				public void actionPerformed(ActionEvent arg0) {
+//					model.addRow(new Object[] { "", "", "" });
+//				}
+//			});
+//
+//			if (table.getSelectedRow() > 0) {
+//
+//				JMenuItem rmColumnItem = new JMenuItem("markierte Zeile l\u00f6schen");
+//				popupMenu.add(rmColumnItem);
+//				rmColumnItem.addActionListener(new ActionListener() {
+//
+//					@Override
+//					public void actionPerformed(ActionEvent arg0) {
+//						model.removeRow(table.getSelectedRow());
+//					}
+//				});
+//			}
+//
+//		}
 
 		if (e.getSource() instanceof JTextArea) {
 			JMenuItem openTextItem = new JMenuItem("Text in Editor \u00F6ffnen");
@@ -488,7 +438,6 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					System.out.println(textArea.getWidth());
 
 					PrintWriter w;
 

@@ -44,10 +44,26 @@ public class Controller implements ControllerInterface {
 	public void setSelectedClass(String selectedClassName) {
 		model.setSelectedClass(selectedClassName);
 	}
+	
+	@Override
+	public void setSelectedGroup(SchoolGroup selectedGroup) {
+		model.setSelectedGroup(selectedGroup);
+	}
+	
+	@Override
+	public void setSelectedSubject(SchoolSubject selectedSubject) {
+		model.setSelectedSubject(selectedSubject);
+	}
 
 	@Override
 	public void teacherAddToActDo(Teacher teacher, double value) {
-		model.teacherAddToActDo(teacher, value);		
+		teacher.addToActDo(value);
+		model.notifyObservers();
+	}
+	
+	@Override
+	public void setSelectedRoom(Room selectedRoom) {
+		model.setSelectedRoom(selectedRoom);
 	}
 	
 }

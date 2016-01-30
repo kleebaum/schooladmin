@@ -20,21 +20,23 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 
 	public ModelDeployment() {
 		super();
+		// this.classSubjectsMap = new HashMap<SchoolClass,
+		// ArrayList<SchoolSubject>>();
 	}
 
 	@Override
-	public void initialize(){
+	public void initialize() {
 		super.initialize();
-		
+
 		String fileTeachers = prop.get("Teachers").toString();
-		initTeachers(fileTeachers);		
+		initTeachers(fileTeachers);
 
 		for (String className : prop.get("SchoolClasses").toString().split("\\s*,\\s*")) {
 			className = className.trim();
 			ArrayList<SchoolSubject> localSubjects = initSchoolClasses(className);
 			SchoolClass localClass = new SchoolClass(className, localSubjects);
-			classes.add(localClass);
-			classNameMap.put(className, localClass);
+			school.getClasses().add(localClass);
+			// classNameMap.put(className, localClass);
 		}
 	}
 
@@ -65,25 +67,25 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 				continue;
 			}
 			String subject = line.get(0);
-			
+
 			String group = line.get(1);
 			String abbr = line.get(2);
 			int hoursOnSubject = Integer.parseInt(line.get(3).trim());
-			Teacher teacher = teacherAbbrMap.get(abbr);
-			SchoolGroup localGroup = null;			
-			if(teacher == null) {
+			Teacher teacher = school.getTeacherByAbbr(abbr);
+			SchoolGroup localGroup = null;
+			if (teacher == null) {
 				teacher = new Teacher("Lehrer fehlt in LehrerDaten.csv", "", abbr);
-				teachers.add(teacher);
-				teacherAbbrMap.put(abbr, teacher);
+				school.getTeachers().add(teacher);
+				school.getTeacherAbbrMap().put(abbr, teacher);
 				teacher.initSchoolGroups();
-			} 
+			}
 			localGroup = new SchoolGroup(group, hoursOnSubject, teacher);
 			teacher.addToActDo(hoursOnSubject);
-			teacher.getSchoolGroups().add(localGroup);	
-			
+			teacher.getSchoolGroups().add(localGroup);
+
 			if (subject.equals(localSubject.getName())) {
 				localSubject.getSchoolGroups().add(localGroup);
-				
+
 			} else {
 				localSubject = new SchoolSubject(subject);
 				groups = new ArrayList<SchoolGroup>();
@@ -108,7 +110,8 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 		header.add("Sollstunden");
 		header.add("Schultyp");
 		header.add("Faecher");
-		ParserInterface nameListParser = new Parser(fileTeachers, "[\\s]*;|,[\\s]*", StandardCharsets.ISO_8859_1, 1, header);
+		ParserInterface nameListParser = new Parser(fileTeachers, "[\\s]*;|,[\\s]*", StandardCharsets.ISO_8859_1, 1,
+				header);
 		try {
 			nameListParser.processLineByLine();
 		} catch (IOException e) {
@@ -125,8 +128,8 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 			String firstname = line.get(1);
 			String abbr = line.get(2);
 			Teacher teacher = new Teacher(surname, firstname, abbr);
-			teachers.add(teacher);
-			teacherAbbrMap.put(abbr, teacher);
+			school.getTeachers().add(teacher);
+			school.getTeacherAbbrMap().put(abbr, teacher);
 			teacher.initSchoolGroups();
 			try {
 				double toDo = Double.parseDouble(line.get(5).trim());
@@ -143,13 +146,30 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 	}
 
 	@Override
-	public void setClasses(ArrayList<SchoolClass> classes) {
-		this.classes = classes;
+	public void exportSchoolClassToCVS(SchoolClass schoolClass, boolean fileChooser) {
+		ArrayList<String> content = new ArrayList<String>();
 
+		ArrayList<SchoolSubject> subjects = schoolClass.getSubjects();
+
+		for (SchoolSubject subject : subjects) {
+			ArrayList<SchoolGroup> groups = subject.getSchoolGroups();
+			for (SchoolGroup group : groups) {
+				content.add(subject.getName() + ";" + group.getName() + ";" + group.getTeacherAbbr() + ";"
+						+ group.getHoursOnSubject());
+			}
+		}
+		exportToCVS("input/", schoolClass.getName() + ".csv", "Fach;Gruppe;Lehrer;Stunden;", content, fileChooser);
 	}
 
 	@Override
-	public ArrayList<SchoolClass> getClasses() {
-		return this.classes;
+	public void exportTeacherOverviewToCVS() {
+		ArrayList<String> content = new ArrayList<String>();
+
+		for (Teacher teacher : school.getTeachers()) {
+			content.add(teacher.getSurname() + ";" + teacher.getFirstname() + ";" + teacher.getToDo() + ";"
+					+ teacher.getActDo() + ";");
+		}
+
+		exportToCVS("", "Vergleich-Ist-Soll.csv", "Nachname;Vorname;Soll;Ist;", content, true);
 	}
 }

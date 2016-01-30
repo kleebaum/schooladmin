@@ -36,7 +36,7 @@ public class Teacher {
 	private BufferedReader in;
 
 	// private enum schooltype {R, G, H};
-	private String[] teacherSpmText;
+	private String teacherSpmText;
 	private String timeTableText;
 	private ArrayList<String> teacherData;
 	private String timestamp;
@@ -72,10 +72,25 @@ public class Teacher {
 		this.toDo = toDo;
 	}
 
-	public Teacher(String surname, String firstname, String abbr, String fileName) {
+	public Teacher(String surname, String firstname, String abbr, String timeTableFile) {
 		this(surname, firstname, abbr);
-		this.timeTableText = readTeacherTimeTableTextFromFile(fileName);
-		this.teacherSpmText = readTeacherSpmTextFromFile(fileName);
+		this.timeTableText = readTeacherTimeTableTextFromFile(timeTableFile);
+	}
+	
+	public Teacher(String surname, String firstname, String abbr, String timeTableFile, String statisticsFile) {
+		this(surname, firstname, abbr, timeTableFile);
+		this.teacherSpmText = readTeacherSpmTextFromFile(statisticsFile);
+	}
+	
+	public Teacher(ArrayList<String> teacherData) {
+		this.teacherData = teacherData;
+	}
+	
+	public Teacher(ArrayList<String> teacherData, String timeTableFile, String statisticsFile) {
+		this(teacherData.get(0), teacherData.get(1) ,teacherData.get(2), timeTableFile);
+		this.teacherData = teacherData;
+		this.teacherSpmText = readTeacherSpmTextFromFile(statisticsFile);
+		this.birthday = teacherData.get(5);
 	}
 
 	private String readTeacherTimeTableTextFromFile(String fileName) {
@@ -117,28 +132,35 @@ public class Teacher {
 		return (this.timestamp + "\r\n" + timeTableText);
 	}
 
-	public String[] readTeacherSpmTextFromFile(String fileName) {
+	public String readTeacherSpmTextFromFile(String fileName) {
+		String spmText = "";
 		boolean foundSpm = false;
-		ArrayList<String> spmArrayList = new ArrayList<String>();
 		try {
 			in = new BufferedReader(new FileReader(fileName));
-			String zeile = null;
-			while ((zeile = in.readLine()) != null) {
+			String line = null;
+			String lastLine = null;
+			while ((line = in.readLine()) != null) {
 				if (foundSpm == true) {
-					if (zeile.equals(""))
+					if (line.equals(""))
 						break;
-					spmArrayList.add(zeile);
+					spmText += line + "\r\n";
 				}
-				if (zeile.startsWith("Spm++ Statistik: " + this.abbr)) {
+				if (line.startsWith("Spm++ Statistik: " + this.abbr)) {
 					foundSpm = true;
-					spmArrayList.add(zeile);
+					spmText += line + "\r\n";
 				}
-
+			lastLine = line;			
 			}
-		} catch (IOException e) {
+			int lastLineLength = lastLine.trim().length();
+			if (lastLine != null & lastLineLength > 1) {				
+				this.actDo = Double.parseDouble(lastLine.substring(lastLineLength-2, lastLineLength).replaceAll("(^\\s+)|.", "0"));
+			}			
+		} catch (IOException | java.lang.NullPointerException e) {
 			e.printStackTrace();
+			return null;
 		}
-		return spmArrayList.toArray(new String[spmArrayList.size()]);
+		
+		return spmText;
 	}
 
 	public String getSurname() {
@@ -182,7 +204,7 @@ public class Teacher {
 	/**
 	 * @return the teacherSpmText
 	 */
-	public String[] getTeacherSpmText() {
+	public String getTeacherSpmText() {
 		return teacherSpmText;
 	}
 
@@ -190,7 +212,7 @@ public class Teacher {
 	 * @param teacherSpmText
 	 *            the teacherSpmText to set
 	 */
-	public void setTeacherSpmText(String[] teacherSpmText) {
+	public void setTeacherSpmText(String teacherSpmText) {
 		this.teacherSpmText = teacherSpmText;
 	}
 

@@ -5,19 +5,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+
 import de.schooladmin.Model;
 import de.schooladmin.Parser;
 import de.schooladmin.ParserInterface;
+import de.schooladmin.SchoolType;
 import de.schooladmin.Teacher;
 
 public class ModelTeachingTime extends Model implements ModelTeachingTimeInterface {
 	
-	private HashMap <String, Double> schoolTypesMap;
 	private LinkedHashMap <String, Integer> teacherDataMap;
+	public ArrayList<String> teacherDataList;
+	public String fileTeachersStatistics;
 
 	public ModelTeachingTime() {
-		this.teachers = new ArrayList<Teacher>();
-		this.schoolTypesMap = new HashMap<String, Double>();
 		this.teacherDataMap = new LinkedHashMap<String, Integer>();
 	}
 
@@ -27,22 +28,50 @@ public class ModelTeachingTime extends Model implements ModelTeachingTimeInterfa
 
 		String fileTeachers = prop.get("Teachers").toString();
 		String fileTimeTableTeachers = prop.get("TimeTableTeachers").toString();
+		fileTeachersStatistics = prop.getProperty("TeachersStatistics");
+		
 		String[] teacherData = prop.getProperty("TeacherData").toString().split("\\s*,\\s*");
 		
-		ArrayList<String> teacherDataList = new ArrayList<String>();
+		teacherDataList = new ArrayList<String>();
 		for (int i = 0; i < teacherData.length; i++) {
 			teacherDataList.add(teacherData[i]);
 			teacherDataMap.put(teacherData[i], i);
 		}
 
+		initTeachers(teacherDataList, fileTeachers, fileTimeTableTeachers);
+
 		String[] schoolTypes = prop.get("SchoolTypes").toString().split("\\s*,\\s*");
-		String[] schoolTypeHours = prop.get("SchoolTypeHours").toString().split("\\s*,\\s*");
+		String[] schoolTypeHours = prop.get("SchoolTypeHours").toString().split("\\s*,\\s*");		
+		String[] schoolTypeNames = prop.get("SchoolTypesName").toString().split("\\s*,\\s*");
+		String[] partialRetirement = prop.get("PartialRetirement").toString().split("\\s*,\\s*");			
+		initSchoolTypes(schoolTypes,schoolTypeHours, schoolTypeNames, partialRetirement);
+	}
+	
+	public void initSchoolTypes(String[] schoolTypes, String[] schoolTypeHours, String[] schoolTypeNames, String[] partialRetirement) {
+		
+		ArrayList<SchoolType> schoolTypesList = new ArrayList<SchoolType>();
+		SchoolType emptyType1 = new SchoolType("", "-", 0.0);
+		SchoolType emptyType2 = new SchoolType(" ", "-", 0.0);
+		schoolTypesList.add(emptyType1);
+		schoolTypesList.add(emptyType2);
+		school.getSchoolTypeMap().put("", emptyType1);
+		school.getSchoolTypeMap().put(" ", emptyType2);		
 
 		for (int i = 0; i < schoolTypes.length; i++) {
-			schoolTypesMap.put(schoolTypes[i], Double.parseDouble(schoolTypeHours[i]));
+			SchoolType newType = new SchoolType(schoolTypes[i], schoolTypeNames[i], Double.parseDouble(schoolTypeHours[i]));
+			schoolTypesList.add(newType);
+			school.getSchoolTypeMap().put(schoolTypes[i], newType);
 		}
 
-		initTeachers(teacherDataList, fileTeachers, fileTimeTableTeachers);
+		for(int i=0; i < partialRetirement.length; i++) {
+			HashMap<Double, Double> partialRetirementMap = new HashMap<Double, Double>();
+			String[] line = partialRetirement[i].split(":");
+			String schoolType = line[0];
+			for (int j=1; j<line.length; j = j+2) {
+				partialRetirementMap.put(0.0,0.0);
+			}			
+			System.out.println(schoolType);
+		}
 	}
 
 	@Override
@@ -62,50 +91,26 @@ public class ModelTeachingTime extends Model implements ModelTeachingTimeInterfa
 				lineCount++;
 				continue;
 			}
-			String surname = line.get(0);
-			String firstname = line.get(1);
-			String abbr = line.get(2);
-
-			Teacher teacher = new Teacher(surname, firstname, abbr, fileTimeTableTeachers);
-
-			teachers.add(teacher);
-			teacherAbbrMap.put(abbr, teacher);
-			try {
-				teacher.setGender(line.get(3));
-				teacher.setBirthday(line.get(4));
-				teacher.setSchoolType(line.get(5));
-				for (int i=0; i < teacherDataList.size(); i++) {
-					teacher.getTeacherData().add(line.get(i).trim());
-				}
-//				teacher.partTime = Double.parseDouble(line.get(6).trim());
-//				teacher.workAccount = Double.parseDouble(line.get(7).trim());
-//				teacher.scientificTime = Double.parseDouble(line.get(8).trim());
-//				teacher.handicapTime = Double.parseDouble(line.get(9).trim());
-//				teacher.seniorReduction = Double.parseDouble(line.get(10).trim());
-//				teacher.compensateMidTerm = Double.parseDouble(line.get(11).trim());
-//				teacher.compensateYear = Double.parseDouble(line.get(12).trim());
-//				teacher.plusMinus = Double.parseDouble(line.get(13).trim());
-//				teacher.directorTime = Double.parseDouble(line.get(14).trim());
-//				teacher.committeTime = Double.parseDouble(line.get(15).trim());
-//				teacher.functionTime = Double.parseDouble(line.get(16).trim());
-//				teacher.otherTimeDif = Double.parseDouble(line.get(17).trim());
-//				teacher.teachingTimeText = line.get(18);
-				teacher.setToDo(Double.parseDouble(line.get(19).trim()));
-
-			} catch (IndexOutOfBoundsException | NumberFormatException e) {
-				setError("Die Lehrerdaten Datei ist unvollst\u00e4ndig.");
+			ArrayList<String> teacherData = new ArrayList<String>();
+			
+			for (int i=0; i < teacherDataList.size(); i++) {
+				teacherData.add(line.get(i).trim());
 			}
+			Teacher teacher = new Teacher(teacherData, fileTimeTableTeachers, fileTeachersStatistics);
+
+			school.getTeachers().add(teacher);
+			school.getTeacherAbbrMap().put(teacherData.get(2), teacher);
 			lineCount++;
 		}
 	}
 	
 	@Override
-	public HashMap <String, Double> getSchoolTypesMap() {
-		return this.schoolTypesMap;
+	public LinkedHashMap <String, Integer> getTeacherDataMap() {
+		return this.teacherDataMap;
 	}
 	
 	@Override
-	public LinkedHashMap <String, Integer> getTeacherDataMap() {
-		return this.teacherDataMap;
+	public ArrayList<String> getTeacherDataList() {
+		return this.teacherDataList;
 	}
 }

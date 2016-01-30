@@ -17,6 +17,7 @@ import de.schooladmin.Parser;
 import de.schooladmin.ParserInterface;
 import de.schooladmin.Room;
 import de.schooladmin.SchoolClass;
+import de.schooladmin.SchoolSubject;
 import de.schooladmin.SchoolTime;
 import de.schooladmin.Teacher;
 
@@ -31,12 +32,6 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 	// current model state
 	private int selectedHour;
 	private int selectedDay;
-	private Room selectedRoom;
-
-	// lists containing needed instances of classes Room, Teacher, SchoolClass
-	// and SchoolTime
-	private ArrayList<Room> rooms;
-	private ArrayList<SchoolTime> times;
 
 	private BufferedReader in;
 
@@ -50,11 +45,12 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 		String fileTimeTableClasses = prop.get("TimeTableSchoolClasses").toString();
 		String fileTimeTableRooms = prop.get("TimeTableRooms").toString();
 		String fileTimeTableTeachers = prop.get("TimeTableTeachers").toString();
-		
+
 		initRooms(fileRooms, fileTimeTableRooms);
 		initTeachers(fileTeachers, fileTimeTableTeachers);
 		initClasses(fileTimeTableClasses);
 		initTimes(fileTimes);
+		initSubjects();
 
 		Date date = new Date();
 		Calendar calendar = GregorianCalendar.getInstance(); // creates a new
@@ -73,15 +69,16 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 		this.selectedHour = 1;
 		try {
 			Date timeNow = timeFormat.parse(calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
-			for (int i = 0; i < times.size(); i++) {
-				if (times.get(i).getStart() <= timeNow.getTime() && times.get(i).getEnd() > timeNow.getTime()) {
-					int referencedHour = times.get(i).getReferencedHour();
+			for (int i = 0; i < school.getTimes().size(); i++) {
+				if (school.getTimes().get(i).getStart() <= timeNow.getTime()
+						&& school.getTimes().get(i).getEnd() > timeNow.getTime()) {
+					int referencedHour = school.getTimes().get(i).getReferencedHour();
 					if (referencedHour != 0) {
 						this.selectedHour = referencedHour;
 
-					} else if (times.get(i + 1) != null) {
+					} else if (school.getTimes().get(i + 1) != null) {
 
-						this.selectedHour = times.get(i + 1).getReferencedHour();
+						this.selectedHour = school.getTimes().get(i + 1).getReferencedHour();
 					}
 					break;
 				}
@@ -95,7 +92,6 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 
 	@Override
 	public void initRooms(String fileName, String fileTimeTableRooms) {
-		this.rooms = new ArrayList<Room>();
 		ArrayList<String> header = new ArrayList<String>();
 		header.add("Name");
 		header.add("Plaetze");
@@ -128,20 +124,20 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 			int yLength = Integer.parseInt(line.get(5));
 			String addOn = line.get(6);
 			String roomArea = line.get(7);
-			rooms.add(new Room(name, space, x, y, xLength, yLength, addOn, roomArea, fileTimeTableRooms));
+			school.getRooms().add(new Room(name, space, x, y, xLength, yLength, addOn, roomArea, fileTimeTableRooms));
 			lineCount++;
 		}
 	}
 
 	@Override
 	public void initTeachers(String fileTeachers, String fileTimeTableTeachers) {
-		this.teachers = new ArrayList<Teacher>();
 		ArrayList<String> header = new ArrayList<String>();
 		header.add("Nachname");
 		header.add("Vorname");
 		header.add("Abk");
 		header.add("Geb.Datum");
-		ParserInterface nameListParser = new Parser(fileTeachers, "[\\s]*;|,[\\s]*", StandardCharsets.ISO_8859_1, 1, header);
+		ParserInterface nameListParser = new Parser(fileTeachers, "[\\s]*;|,[\\s]*", StandardCharsets.ISO_8859_1, 1,
+				header);
 		try {
 			nameListParser.processLineByLine();
 		} catch (IOException e) {
@@ -158,25 +154,24 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 			String surname = line.get(0);
 			String firstname = line.get(1);
 			String abbr = line.get(2);
-			teachers.add(new Teacher(surname, firstname, abbr, fileTimeTableTeachers));
+			Teacher teacher = new Teacher(surname, firstname, abbr, fileTimeTableTeachers);
+			school.getTeachers().add(teacher);
+			school.getTeacherAbbrMap().put(abbr, teacher);
 			lineCount++;
 		}
 	}
 
 	@Override
 	public void initClasses(String fileName) {
-		this.classes = new ArrayList<SchoolClass>();
 		try {
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(
-					fileName),
-					StandardCharsets.ISO_8859_1));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1));
 			String zeile = null;
 			while ((zeile = in.readLine()) != null) {
 				if (zeile.contains("Staatl.")) {
 					String[] splitItems = zeile.split(" ");
 					for (int i = 0; i < splitItems.length; i++) {
 						if (splitItems[i].equals("Klasse")) {
-							classes.add(new SchoolClass(splitItems[i + 1], fileName));
+							school.getClasses().add(new SchoolClass(splitItems[i + 1], fileName));
 						}
 					}
 				}
@@ -188,7 +183,6 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 
 	@Override
 	public void initTimes(String fileName) {
-		this.times = new ArrayList<SchoolTime>();
 		ArrayList<String> header = new ArrayList<String>();
 		header.add("name");
 		header.add("start");
@@ -213,7 +207,7 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 			try {
 				start = formatter.parse(line.get(1));
 				end = formatter.parse(line.get(2));
-				times.add(new SchoolTime(name, start.getTime(), end.getTime()));
+				school.getTimes().add(new SchoolTime(name, start.getTime(), end.getTime()));
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -223,8 +217,33 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 	}
 
 	@Override
+	public void initSubjects() {
+		for (Room room : school.getRooms()) {
+			for (int i = 1; i < 6; i++)
+				for (int j = 1; j < 12; j++) {
+					String subjectName = room.getSubject(i, j);
+					String teacherName = room.getTeacher(i, j);
+					Teacher teacher = school.getTeacherByAbbr(teacherName);
+
+					SchoolSubject subject = school.getSubjectNameMap().get(subjectName);
+					if (subject == null) {
+						SchoolSubject newSubject = new SchoolSubject(subjectName);
+						school.getSubjectNameMap().put(subjectName, newSubject);
+						if (teacher != null && !newSubject.getTeachersOnSubject().contains(teacher))
+							newSubject.getTeachersOnSubject().add(teacher);
+					} else {
+						if (teacher != null && !subject.getTeachersOnSubject().contains(teacher))
+							subject.getTeachersOnSubject().add(teacher);
+					}
+				}
+		}
+		for (SchoolSubject subject : school.getSubjectNameMap().values())
+			school.getSubjects().add(subject);
+	}
+
+	@Override
 	public String getRoomAllocationTeacherAbbr(String roomName) {
-		for (Room room : rooms) {
+		for (Room room : school.getRooms()) {
 			if (room.getName().equals(roomName)) {
 				String roomAllocationTeacher = room.getRoomAllocation()[this.getSelectedDay() - 1][this
 						.getSelectedHour() - 1][0];
@@ -239,9 +258,10 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 
 	@Override
 	public String getRoomAllocationClassName(String roomName) {
-		for (Room room : rooms) {
+		for (Room room : school.getRooms()) {
 			if (room.getName().equals(roomName)) {
-				String roomAllocationClass = room.getRoomAllocation()[this.getSelectedDay() - 1][this.getSelectedHour() - 1][1];
+				String roomAllocationClass = room.getRoomAllocation()[this.getSelectedDay() - 1][this.getSelectedHour()
+						- 1][1];
 				if (roomAllocationClass == null && room.getRoomAllocationText() != "") {
 					return "";
 				}
@@ -254,7 +274,7 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 	@Override
 	public Teacher getRoomAllocationTeacher(String roomName) {
 		String abbr = getRoomAllocationTeacherAbbr(roomName);
-		for (Teacher teacher : teachers) {
+		for (Teacher teacher : school.getTeachers()) {
 			if (teacher.getAbbr().equals(abbr)) {
 				return teacher;
 			}
@@ -266,7 +286,7 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 	public SchoolClass getRoomAllocationClass(String roomName) {
 		String name = getRoomAllocationClassName(roomName);
 		// System.out.println(name);
-		for (SchoolClass schoolClass : classes) {
+		for (SchoolClass schoolClass : school.getClasses()) {
 			if (name.contains(schoolClass.getName())) {
 				return schoolClass;
 			}
@@ -276,7 +296,7 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 
 	@Override
 	public String getRoomAllocationSubject(String roomName) {
-		for (Room room : rooms) {
+		for (Room room : school.getRooms()) {
 			if (room.getName().equals(roomName)) {
 				String roomAllocationSubject = room.getRoomAllocation()[selectedDay - 1][selectedHour - 1][2];
 				return roomAllocationSubject;
@@ -295,28 +315,6 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 	public void setSelectedHour(int selectedHour) {
 		this.selectedHour = selectedHour;
 		notifyObservers();
-	}
-
-	@Override
-	public void setRooms(ArrayList<Room> rooms) {
-		this.rooms = rooms;
-
-	}
-
-	@Override
-	public ArrayList<Room> getRooms() {
-		return this.rooms;
-	}
-
-	@Override
-	public void setSelectedRoom(Room selectedRoom) {
-		this.selectedRoom = selectedRoom;
-		notifyObservers();
-	}
-
-	@Override
-	public Room getSelectedRoom() {
-		return this.selectedRoom;
 	}
 
 	@Override
@@ -354,32 +352,4 @@ public class ModelRoomAlloc extends Model implements ModelRoomAllocInterface {
 		}
 	}
 
-	@Override
-	public ArrayList<SchoolClass> getClasses() {
-		return this.classes;
-	}
-
-	@Override
-	public void setClasses(ArrayList<SchoolClass> classes) {
-		this.classes = classes;
-	}
-
-	@Override
-	public ArrayList<SchoolTime> getTimes() {
-		return times;
-	}
-
-	@Override
-	public void setTimes(ArrayList<SchoolTime> times) {
-		this.times = times;
-	}
-
-	@Override
-	public Room getRoomByName(String roomName) {
-		for (Room room : rooms) {
-			if (room.getName().equals(roomName))
-				return room;
-		}
-		return null;
-	}
 }

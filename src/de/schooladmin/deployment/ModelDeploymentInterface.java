@@ -1,8 +1,6 @@
 package de.schooladmin.deployment;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-
 import de.schooladmin.ModelInterface;
 import de.schooladmin.SchoolClass;
 
@@ -16,18 +14,8 @@ public interface ModelDeploymentInterface extends ModelInterface {
 	 */
 	void initTeachers(String fileName) throws FileNotFoundException;
 	
-	/**
-	 * initializes school class list
-	 * 
-	 * @param classes
-	 *            list of school classes
-	 */
-	void setClasses(ArrayList<SchoolClass> classes);
+	void exportSchoolClassToCVS(SchoolClass schoolClass, boolean fileChooser);
 
-	/**
-	 * 
-	 * @return list of school classes
-	 */
-	ArrayList<SchoolClass> getClasses();
+	void exportTeacherOverviewToCVS();
 	
 }

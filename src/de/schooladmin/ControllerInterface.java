@@ -10,5 +10,8 @@ public interface ControllerInterface {
 	void setSelectedClass(String selectedClassName);
 	void setError(String message);
 	void teacherAddToActDo(Teacher selectedTeacher, double value);
+	void setSelectedGroup(SchoolGroup selectedGroup);
+	void setSelectedSubject(SchoolSubject selectedSubject);
+	void setSelectedRoom(Room selectedRoom);
 
 }

@@ -1,13 +1,15 @@
 package de.schooladmin.roomalloc;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -23,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -33,6 +36,7 @@ import javax.swing.event.MenuListener;
 
 import de.schooladmin.Room;
 import de.schooladmin.SchoolClass;
+import de.schooladmin.SchoolSubject;
 import de.schooladmin.Teacher;
 import de.schooladmin.View;
 import de.schooladmin.Room.RoomArea;
@@ -57,6 +61,7 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 	JPanel roomPanel;
 	JPanel listPanel;
 	JPanel showTextPanel;
+	JPanel subjectPanel;
 
 	JList<String> teacherList1;
 	JList<String> teacherList2;
@@ -72,17 +77,39 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		super.createCards();
 		createRoomView();
 		createListView();
+		createSubjectView();
 		cards.add(viewPanel, "viewPanel");
 		cards.add(roomPanel, "roomPanel");
 		cards.add(listPanel, "listPanel");
+		cards.add(subjectPanel, "subjectPanel");
 	}
 
 	public JMenuBar createMenuBar() {
 		super.createMenuBar();
-		// menuFile.add(new JSeparator());
+		JMenuItem menuItemOpenTeacherData = new JMenuItem("Lehrer-Datei \u00f6ffnen");
+		menuFile.add(menuItemOpenTeacherData);
+		menuItemOpenTeacherData.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				File file = new File(model.getFileTeachers());
+
+				Desktop desktop = Desktop.getDesktop();
+				if (file.exists())
+					try {
+						desktop.open(file);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+		});
+
+		menuFile.add(new JSeparator());
 		menuFile.add(menuItemClose);
 		JMenu menuRoom = new JMenu("Raumplan");
 		JMenu menuLists = new JMenu("Stundenpl\u00E4ne");
+		JMenu menuSubjects = new JMenu("F\u00E4cher");
 
 		menuBar.add(menuRoom);
 		menuRoom.addMenuListener(new MenuListener() {
@@ -115,6 +142,23 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 			@Override
 			public void menuSelected(MenuEvent arg0) {
 				cardLayout.show(cards, "listPanel");
+			}
+		});
+
+		menuBar.add(menuSubjects);
+		menuSubjects.addMenuListener(new MenuListener() {
+
+			@Override
+			public void menuCanceled(MenuEvent arg0) {
+			}
+
+			@Override
+			public void menuDeselected(MenuEvent arg0) {
+			}
+
+			@Override
+			public void menuSelected(MenuEvent arg0) {
+				cardLayout.show(cards, "subjectPanel");
 			}
 		});
 
@@ -189,7 +233,7 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		JScrollPane scrollPaneClassList = new JScrollPane(classList);
 		panelClass.add(scrollPaneClassList);
 		ArrayList<String> classResultArrayList = new ArrayList<String>();
-		for (SchoolClass schoolClass : model.getClasses()) {
+		for (SchoolClass schoolClass : model.getSchool().getClasses()) {
 			classResultArrayList.add(schoolClass.getName());
 		}
 		String[] classResultArray = classResultArrayList.toArray(new String[classResultArrayList.size()]);
@@ -199,7 +243,7 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		classList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
 				if (!evt.getValueIsAdjusting()) {
-					for (SchoolClass schoolClass : model.getClasses()) {
+					for (SchoolClass schoolClass : model.getSchool().getClasses()) {
 						if (schoolClass.getName().equals(classList.getSelectedValue())) {
 							controller.setSelectedClass(schoolClass);
 						}
@@ -300,12 +344,10 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		panelTeacher.add(scrollPaneTeacherList);
 		teacherList2.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent mouseEvent) {
-				for (Teacher teacher : model.getTeachers()) {
+				for (Teacher teacher : model.getSchool().getTeachers()) {
 					if (teacher.getAbbr().equals(teacherList2.getSelectedValue().split(" ")[0])) {
 						controller.setSelectedTeacher(teacher);
-						showText(
-								"Lehrerstundenplan f\u00fcr " + teacher.getSurname() + ", "
-										+ teacher.getFirstname(),
+						showText("Lehrerstundenplan f\u00fcr " + teacher.getSurname() + ", " + teacher.getFirstname(),
 								teacher.getTimeTableText(), "F\u00fcr " + teacher.getSurname() + ", "
 										+ teacher.getFirstname() + " ist leider kein Stundenplan vorhanden.");
 					}
@@ -321,7 +363,7 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		classList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		ArrayList<String> classResultArrayList = new ArrayList<String>();
-		for (SchoolClass schoolClass : model.getClasses()) {
+		for (SchoolClass schoolClass : model.getSchool().getClasses()) {
 			classResultArrayList.add(schoolClass.getName());
 		}
 		String[] classResultArray = classResultArrayList.toArray(new String[classResultArrayList.size()]);
@@ -332,11 +374,10 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 
 		classList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent mouseEvent) {
-				for (SchoolClass schoolClass : model.getClasses()) {
+				for (SchoolClass schoolClass : model.getSchool().getClasses()) {
 					if (schoolClass.getName().equals(classList.getSelectedValue())) {
 						controller.setSelectedClass(schoolClass);
-						showText("Stundenplan f\u00fcr Klasse " + schoolClass.getName(),
-								schoolClass.getTimeTableText(),
+						showText("Stundenplan f\u00fcr Klasse " + schoolClass.getName(), schoolClass.getTimeTableText(),
 								"F\u00fcr diese Klasse wurde leider kein Stundenplan gefunden.");
 					}
 				}
@@ -351,7 +392,7 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		ArrayList<String> roomResultArrayList = new ArrayList<String>();
-		for (Room room : model.getRooms()) {
+		for (Room room : model.getSchool().getRooms()) {
 			if (!room.getRoomAllocationText().equals("")) {
 				roomResultArrayList.add(room.getName());
 			}
@@ -361,10 +402,10 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 
 		JScrollPane scrollPaneRoomList = new JScrollPane(roomList);
 		panelRoom.add(scrollPaneRoomList);
-		
+
 		roomList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent mouseEvent) {
-				for (Room room : model.getRooms()) {
+				for (Room room : model.getSchool().getRooms()) {
 					if (room.getName().equals(roomList.getSelectedValue())) {
 						controller.setSelectedRoom(room);
 						showText("Stundenplan f\u00fcr Raum " + room.getName(), room.getRoomAllocationText(),
@@ -392,11 +433,90 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 	}
 
 	@Override
+	public void createSubjectView() {
+		subjectPanel = new JPanel();
+		initPanelLayout(subjectPanel);
+
+		// teacher on subject list
+		final JPanel panelTeachers = new JPanel(new GridLayout(1, 0));
+		panelTeachers.setBorder(BorderFactory.createTitledBorder("Lehrer"));
+		final JList<String> teacherList = new JList<String>();
+		teacherList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+		JScrollPane scrollPaneTeacherList = new JScrollPane(teacherList);
+		panelTeachers.add(scrollPaneTeacherList);
+		teacherList.addMouseListener(new PopClickListener());
+		teacherList.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent mouseEvent) {
+				for (Teacher teacher : model.getSchool().getTeachers()) {
+					if (teacher.getAbbr().equals(teacherList.getSelectedValue().split(" ")[0])) {
+						controller.setSelectedTeacher(teacher);
+						showText("Lehrerstundenplan f\u00fcr " + teacher.getSurname() + ", " + teacher.getFirstname(),
+								teacher.getTimeTableText(), "F\u00fcr " + teacher.getSurname() + ", "
+										+ teacher.getFirstname() + " ist leider kein Stundenplan vorhanden.");
+					}
+				}
+			}
+		});
+
+		// subject list
+		JPanel panelSubject = new JPanel(new GridLayout(1, 0));
+		panelSubject.setBorder(BorderFactory.createTitledBorder("F\u00E4cher"));
+		final JList<String> subjectList = new JList<String>();
+		subjectList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+		ArrayList<SchoolSubject> subjects = model.getSchool().getSubjects();
+		String[] subjectArray = new String[subjects.size()];
+		for (int i = 0; i < subjects.size(); i++) {
+			subjectArray[i] = subjects.get(i).getName();
+		}
+		subjectList.setListData(subjectArray);
+
+		JScrollPane scrollPaneSubjectList = new JScrollPane(subjectList);
+		panelSubject.add(scrollPaneSubjectList);
+
+		subjectList.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent mouseEvent) {
+				SchoolSubject selectedSubject = model.getSchool().getSubjects().get(subjectList.getSelectedIndex());
+
+				ArrayList<Teacher> teachers = selectedSubject.getTeachersOnSubject();
+				String[] teacherArray = new String[teachers.size()];
+				for (int i=0; i<teachers.size(); i++) {
+					teacherArray[i] = teachers.get(i).getAbbr() + " = " + teachers.get(i).getSurname() + ", " + teachers.get(i).getFirstname();
+				}
+				
+				teacherList.setListData(teacherArray);
+				panelTeachers.setBorder(BorderFactory.createTitledBorder("Lehrer mit Unterricht in " + selectedSubject.getName()));
+
+				
+			}
+		});
+		subjectList.addMouseListener(new PopClickListener());
+
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+				// .addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE,
+				// panelTeacher.getPreferredSize().width,
+				// GroupLayout.PREFERRED_SIZE)
+				// .addContainerGap()
+				.addComponent(panelSubject, GroupLayout.PREFERRED_SIZE, panelSubject.getPreferredSize().width + 20,
+						GroupLayout.PREFERRED_SIZE)
+				.addContainerGap().addComponent(panelTeachers, GroupLayout.PREFERRED_SIZE,
+						panelTeachers.getPreferredSize().width + 20, GroupLayout.PREFERRED_SIZE));
+
+		layout.setVerticalGroup(layout.createParallelGroup()
+				// .addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE,
+				// screenHeight, GroupLayout.PREFERRED_SIZE)
+				.addComponent(panelSubject, GroupLayout.PREFERRED_SIZE, screenHeight, GroupLayout.PREFERRED_SIZE)
+
+				.addComponent(panelTeachers, GroupLayout.PREFERRED_SIZE, screenHeight, GroupLayout.PREFERRED_SIZE));
+	}
+
+	@Override
 	public void fillRoomArea(JPanel panel, String roomAreaTitle, RoomArea roomArea, int areaWidth, int areaLength) {
 		panel.setLayout(null);
 		panel.setBorder(BorderFactory.createTitledBorder(roomAreaTitle));
 
-		for (final Room room : model.getRooms()) {
+		for (final Room room : model.getSchool().getRooms()) {
 			if (room.getRoomArea().equals(roomArea)) {
 				int xKoordRel = room.getX() * panelWidth / areaWidth;
 				int yKoordRel = room.getY() * panelLength / areaLength;
@@ -627,7 +747,7 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 			}
 		});
 
-		JMenuItem printItem = new JMenuItem("Ansicht drucken");
+		JMenuItem printItem = new JMenuItem("Bildschirmfoto drucken");
 		popupMenu.add(printItem);
 		printItem.addActionListener(new ActionListener() {
 			@Override
@@ -645,13 +765,14 @@ public class ViewRoomAlloc extends View implements ViewRoomAllocInterface {
 		String separation = "+========+=========+========+==========================+ \r\n";
 		String roomAllocation = separation + "| Raum   | Klasse  | Fach   | Lehrer                   | \r\n"
 				+ separation;
-		for (Room room : model.getRooms()) {
+		for (Room room : model.getSchool().getRooms()) {
 			if (!room.getRoomAllocationText().equals("")) {
 				String roomName = room.getName();
 				String schoolClass = room.getSchoolClass(selectedDay, selectedHour);
 				String subject = room.getSubject(selectedDay, selectedHour);
 				String teacherName = "";
-				Teacher roomAllocationTeacher = model.getTeacherByAbbr(room.getTeacher(selectedDay, selectedHour));
+				Teacher roomAllocationTeacher = model.getSchool()
+						.getTeacherByAbbr(room.getTeacher(selectedDay, selectedHour));
 				if (roomAllocationTeacher != null) {
 					teacherName += roomAllocationTeacher.getSurname() + ", " + roomAllocationTeacher.getFirstname();
 				}

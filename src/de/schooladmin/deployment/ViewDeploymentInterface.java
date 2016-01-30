@@ -1,5 +1,6 @@
 package de.schooladmin.deployment;
 
+import de.schooladmin.SchoolClass;
 import de.schooladmin.ViewInterface;
 
 /**
@@ -9,6 +10,5 @@ import de.schooladmin.ViewInterface;
 public interface ViewDeploymentInterface extends ViewInterface {
 	void createOverView();
 	void createClassesView();
-	void exportTableDataToCVS(String className, boolean fileChooser);
-
+	void createClassView(SchoolClass schoolClass);
 }

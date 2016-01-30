@@ -2,8 +2,8 @@ package de.schooladmin;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -68,13 +68,6 @@ public interface ViewInterface {
 	public abstract void exitProgram();
 
 	/**
-	 * exports table to text file
-	 * @param className
-	 */
-	void exportTableDataToCVS(String folder, String fileName, String header, 
-			ArrayList<String> content, boolean fileChooser);
-
-	/**
 	 * prints a gui component
 	 * @param toPrint
 	 * @param name
@@ -98,5 +91,7 @@ public interface ViewInterface {
 	 * @return JPopupMenu popupMenu
 	 */
 	JPopupMenu createPopUpMenu(MouseEvent e);
+
+	JFrame window(String title);
 	
 }

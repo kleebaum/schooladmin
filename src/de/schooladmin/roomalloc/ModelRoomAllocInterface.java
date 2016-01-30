@@ -1,11 +1,7 @@
 package de.schooladmin.roomalloc;
 
-import java.util.ArrayList;
-
 import de.schooladmin.ModelInterface;
-import de.schooladmin.Room;
 import de.schooladmin.SchoolClass;
-import de.schooladmin.SchoolTime;
 import de.schooladmin.Teacher;
 
 /**
@@ -88,59 +84,6 @@ public interface ModelRoomAllocInterface extends ModelInterface {
 	 */
 	String getSelectedDayName();
 
-	/**
-	 * sets selected room
-	 * 
-	 * @param selectedRoom
-	 */
-	void setSelectedRoom(Room selectedRoom);
-
-	/**
-	 * 
-	 * @return selected room
-	 */
-	Room getSelectedRoom();
-
-	/**
-	 * initializes room list
-	 * 
-	 * @param rooms
-	 */
-	void setRooms(ArrayList<Room> rooms);
-
-	/**
-	 * 
-	 * @return list of rooms
-	 */
-	ArrayList<Room> getRooms();
-
-	/**
-	 * initializes school class list
-	 * 
-	 * @param classes
-	 *            list of school classes
-	 */
-	void setClasses(ArrayList<SchoolClass> classes);
-
-	/**
-	 * 
-	 * @return list of school classes
-	 */
-	ArrayList<SchoolClass> getClasses();
-
-	/**
-	 * initializes school times
-	 * 
-	 * @param times
-	 *            list of school times
-	 */
-	void setTimes(ArrayList<SchoolTime> times);
-
-	/**
-	 * 
-	 * @return list of school times
-	 */
-	ArrayList<SchoolTime> getTimes();
 	
 	/**
 	 * returns the teacher abbreviation allocating the room named 'roomName' at selected hour
@@ -165,13 +108,6 @@ public interface ModelRoomAllocInterface extends ModelInterface {
 	 * @return subject
 	 */
 	String getRoomAllocationSubject(String roomName);
-
-	/**
-	 * returns room named 'roomName'
-	 * @param roomName name of room
-	 * @return room
-	 */
-	Room getRoomByName(String roomName);
 	
 	/**
 	 * returns name of school class allocating the room named 'roomName' at selected hour
@@ -186,4 +122,6 @@ public interface ModelRoomAllocInterface extends ModelInterface {
 	 * @return school class
 	 */
 	SchoolClass getRoomAllocationClass(String roomName);
+
+	void initSubjects();
 }

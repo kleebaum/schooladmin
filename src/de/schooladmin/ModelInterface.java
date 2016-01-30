@@ -7,7 +7,7 @@ public interface ModelInterface {
 	
 	// input file location
 	final String ConfigFile = "input/config.txt";
-	final String version = "1.1.4";
+	final String version = "1.2.4";
 	
 	/**
 	 * observing view is registered
@@ -31,12 +31,6 @@ public interface ModelInterface {
 	void initialize();
 	
 	/**
-	 * returns the teacher belonging to a certain abbreviation
-	 * @return teacher
-	 */
-	Teacher getTeacherByAbbr(String abbr);
-	
-	/**
 	 * @return the error
 	 */
 	public String getError();
@@ -45,73 +39,52 @@ public interface ModelInterface {
 	 * @param error the error to set
 	 */
 	public void setError(String error);
-	
-	/**
-	 * sets selected teacher
-	 * 
-	 * @param selectedTeacher
-	 */
-	void setSelectedTeacher(Teacher selectedTeacher);
-	
-	/**
-	 * sets selected teacher by abbr
-	 * 
-	 * @param selectedTeacher
-	 */
-	void setSelectedTeacher(String abbr);
-
-	/**
-	 * 
-	 * @return selected teacher
-	 */
-	Teacher getSelectedTeacher();
-
-	/**
-	 * initializes teacher list
-	 * 
-	 * @param teachers
-	 */
-	void setTeachers(ArrayList<Teacher> teachers);
-
-	/**
-	 * 
-	 * @return list of teachers
-	 */
-	ArrayList<Teacher> getTeachers();
 
 	/**
 	 * 
 	 * @return program name
 	 */
 	String getName();
-	
-	/**
-	 * sets selected class
-	 * 
-	 * @param selectedClass
-	 */
-	void setSelectedClass(SchoolClass selectedClass);
-	
-	/**
-	 * sets selected class
-	 * 
-	 * @param selectedClass
-	 */
-	void setSelectedClass(String selectedClassName);		
 
 	/**
-	 * 
-	 * @return selected class
+	 * exports table to text file
+	 * @param className
 	 */
+	void exportToCVS(String folder, String fileName, String header, 
+			ArrayList<String> content, boolean fileChooser);
+
+	School getSchool();
+
+	void setSchool(School school);
+
+	void setSelectedTeacher(String abbr);
+
+	void setSelectedRoom(Room selectedRoom);
+
+	Room getSelectedRoom();
+
+	void setSelectedGroup(SchoolGroup selectedGroup);
+
+	SchoolGroup getSelectedGroup();
+
+	Teacher getOldSelectedTeacher();
+
+	void setOldSelectedTeacher(Teacher oldSelectedTeacher);
+
+	void setSelectedSubject(SchoolSubject selectedSubject);
+
+	SchoolSubject getSelectedSubject();
+
+	void setSelectedClass(String selectedClassName);
+
+	void setSelectedClass(SchoolClass selectedClass);
+
 	SchoolClass getSelectedClass();
 
-	/**
-	 * 
-	 * @param teacher
-	 * @param value
-	 * 
-	 * adds value to the teachers teaching hours, notifies observers
-	 */
-	void teacherAddToActDo(Teacher teacher, double value);
+	void setSelectedTeacher(Teacher selectedTeacher);
+
+	Teacher getSelectedTeacher();
+
+	String getFileTeachers();
 
 }

@@ -67,4 +67,6 @@ public interface ViewRoomAllocInterface extends ViewInterface {
 	 * @return String with whitespaces of a certain length
 	 */
 	public abstract String whitespaceCalc(int totalLength, int letterLength);
+
+	void createSubjectView();
 }

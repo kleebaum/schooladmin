@@ -27,7 +27,8 @@ public class Room {
 	private BufferedReader in;
 	private Scanner scanner;
 
-	public Room(String name, int space, int x, int y, int xLength, int yLength, String addOn, String roomArea, String fileTimeTableRooms) {
+	public Room(String name, int space, int x, int y, int xLength, int yLength, String addOn, String roomArea,
+			String fileTimeTableRooms) {
 		this.name = name;
 		this.space = space;
 		this.x = x;
@@ -111,7 +112,7 @@ public class Room {
 						break;
 					roomAllocationText += zeile + "\r\n";
 				}
-				if (zeile.contains("Staatl.") && zeile.contains(" r" +  this.name + " ")) {
+				if (zeile.contains("Staatl.") && zeile.contains(" r" + this.name + " ")) {
 					foundRoom = true;
 					zeile = in.readLine();
 				}
@@ -203,25 +204,29 @@ public class Room {
 	public void setAddOn(String addOn) {
 		this.addOn = addOn;
 	}
-	
+
 	public String getSchoolClass(int selectedDay, int selectedHour) {
-		String schoolClass = this.roomAllocation[selectedDay - 1][selectedHour - 1][1];	
+		String schoolClass = this.roomAllocation[selectedDay - 1][selectedHour - 1][1];
 		if (schoolClass != null)
 			return schoolClass;
 		return "";
 	}
-	
+
 	public String getTeacher(int selectedDay, int selectedHour) {
-		String teacher = this.roomAllocation[selectedDay - 1][selectedHour - 1][0];		
-		if (teacher != null) 
+		String teacher = this.roomAllocation[selectedDay - 1][selectedHour - 1][0];
+		if (teacher != null)
 			return teacher;
 		return "";
 	}
-	
+
 	public String getSubject(int selectedDay, int selectedHour) {
-		String subject = this.roomAllocation[selectedDay - 1][selectedHour - 1][2];		
-		if (subject != null)
-			return subject;
+		try {
+			String subject = this.roomAllocation[selectedDay - 1][selectedHour - 1][2];
+			if (subject != null)
+				return subject;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return "";
+		}
 		return "";
 	}
 

@@ -13,22 +13,23 @@ public class SchoolGroup {
 	private SchoolSubject subject;
 	private String teacherAbbr;
 	public Model model;
-	
-	public SchoolGroup (String name, int hoursOnSubject, Teacher teacherOnSubject) {
+
+	public SchoolGroup(String name, int hoursOnSubject, Teacher teacherOnSubject) {
 		this.name = name;
 		this.hoursOnSubject = hoursOnSubject;
 		this.teacherOnSubject = teacherOnSubject;
-		try {
-		this.setTeacherAbbr(teacherOnSubject.getAbbr());
-		} catch (NullPointerException e) {
-			
-		}
+		if (teacherOnSubject != null)
+			this.teacherAbbr = teacherOnSubject.getAbbr();
+		else
+			this.teacherAbbr = "";
 	}
-	
-	public SchoolGroup (String name, int hoursOnSubject, String teacherAbbr) {		
+
+	public SchoolGroup(String name, int hoursOnSubject, String teacherAbbr) {
 		this.name = name;
 		this.hoursOnSubject = hoursOnSubject;
-		this.setTeacherAbbr(teacherAbbr);
+		this.teacherAbbr = teacherAbbr;
+		if (this.teacherAbbr.equals(""))
+			this.teacherOnSubject = null;
 	}
 
 	/**
@@ -39,7 +40,8 @@ public class SchoolGroup {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -53,7 +55,8 @@ public class SchoolGroup {
 	}
 
 	/**
-	 * @param hours_on_subject the hours_on_subject to set
+	 * @param hours_on_subject
+	 *            the hours_on_subject to set
 	 */
 	public void setHoursOnSubject(int hoursOnSubject) {
 		this.hoursOnSubject = hoursOnSubject;
@@ -67,10 +70,12 @@ public class SchoolGroup {
 	}
 
 	/**
-	 * @param teacher_on_subject the teacher_on_subject to set
+	 * @param teacher_on_subject
+	 *            the teacher_on_subject to set
 	 */
 	public void setTeacherOnSubject(Teacher teacherOnSubject) {
 		this.teacherOnSubject = teacherOnSubject;
+		this.teacherAbbr = teacherOnSubject.getAbbr();
 	}
 
 	/**
@@ -81,7 +86,8 @@ public class SchoolGroup {
 	}
 
 	/**
-	 * @param teacherAbbr the teacherAbbr to set
+	 * @param teacherAbbr
+	 *            the teacherAbbr to set
 	 */
 	public void setTeacherAbbr(String teacherAbbr) {
 		this.teacherAbbr = teacherAbbr;
@@ -95,7 +101,8 @@ public class SchoolGroup {
 	}
 
 	/**
-	 * @param subject the subject to set
+	 * @param subject
+	 *            the subject to set
 	 */
 	public void setSubject(SchoolSubject subject) {
 		this.subject = subject;
