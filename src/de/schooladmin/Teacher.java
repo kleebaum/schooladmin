@@ -90,7 +90,7 @@ public class Teacher {
 		this(teacherData.get(0), teacherData.get(1) ,teacherData.get(2), timeTableFile);
 		this.teacherData = teacherData;
 		this.teacherSpmText = readTeacherSpmTextFromFile(statisticsFile);
-		this.birthday = teacherData.get(5);
+		this.birthday = teacherData.get(4);
 	}
 
 	private String readTeacherTimeTableTextFromFile(String fileName) {

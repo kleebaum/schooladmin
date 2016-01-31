@@ -38,33 +38,16 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 
 	ArrayList<JTextField> teacherDataFields;
 	ArrayList<JLabel> teacherDataLabels;
-
-	JLabel nameLabel;
-	private JLabel schoolTypeLabel;
-	private JLabel genderLabel;
+	ArrayList<JLabel> contentLabels;
+	ArrayList<JLabel> curSumLabels;
 
 	private static final long serialVersionUID = 1L;
 	ModelTeachingTimeInterface model;
 	ControllerTeachingTimeInterface controller;
 
-	private JLabel birthdayLabel;
-
-	private JLabel ageLabel;
-
-	private JLabel schoolAgeLabel;
-
-	private JLabel teachingTimeLabel;
-
-	private JLabel curSum1Label;
-
-	private JLabel curSum2Label;
-
-	private JLabel seniorReductionLabel;
-
 	private JTextArea teacherInfoText;
 
-	public ViewTeachingTime(ControllerTeachingTimeInterface controller,
-			ModelTeachingTimeInterface model) {
+	public ViewTeachingTime(ControllerTeachingTimeInterface controller, ModelTeachingTimeInterface model) {
 		super(controller, model);
 		this.model = model;
 		this.controller = controller;
@@ -74,6 +57,17 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		for (String teacherDataEntry : model.getTeacherDataMap().keySet()) {
 			this.teacherDataFields.add(new JTextField(""));
 			this.teacherDataLabels.add(new JLabel(teacherDataEntry));
+		}
+		this.curSumLabels = new ArrayList<JLabel>();
+		this.contentLabels = new ArrayList<JLabel>();
+		for (int i = 0; i < 10; i++) {
+			JLabel newContentLabel = new JLabel("");
+			this.contentLabels.add(newContentLabel);
+		}
+		for (int i = 0; i < 5; i++) {
+			JLabel newCurSumLabel = new JLabel("");
+			newCurSumLabel.setHorizontalAlignment(JLabel.RIGHT);
+			this.curSumLabels.add(newCurSumLabel);
 		}
 	}
 
@@ -98,17 +92,17 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 				exportTeacherDataToCVS(model.getFileTeachers(), true);
 			}
 		});
-		
+
 		JMenuItem menuItemOpenTeacherData = new JMenuItem("Lehrer-Datei \u00f6ffnen");
 		menuFile.add(menuItemOpenTeacherData);
 		menuItemOpenTeacherData.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-		        File file = new File(model.getFileTeachers());
-		         
-		        Desktop desktop = Desktop.getDesktop();
-		        if(file.exists())
+				File file = new File(model.getFileTeachers());
+
+				Desktop desktop = Desktop.getDesktop();
+				if (file.exists())
 					try {
 						desktop.open(file);
 					} catch (IOException e) {
@@ -163,7 +157,8 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		teacherList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
 				if (!evt.getValueIsAdjusting()) {
-							controller.setSelectedTeacher(model.getSchool().getTeacherByAbbr(teacherList.getSelectedValue().split(" ")[0]));					
+					controller.setSelectedTeacher(
+							model.getSchool().getTeacherByAbbr(teacherList.getSelectedValue().split(" ")[0]));
 				}
 			}
 		});
@@ -180,9 +175,8 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		c.weightx = 1.7;
 		c.weighty = 2.0;
 
-		teacherDataFields.get(0).setPreferredSize(
-				new Dimension(120,
-						teacherDataFields.get(0).getPreferredSize().height));
+		teacherDataFields.get(0)
+				.setPreferredSize(new Dimension(120, teacherDataFields.get(0).getPreferredSize().height));
 		for (int i = 0; i < teacherDataFields.size(); i++) {
 			c.gridx = 0;
 			c.gridy = i;
@@ -193,9 +187,9 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					controller.setSelectedTeacher(model.getSelectedTeacher());					
+					controller.setSelectedTeacher(model.getSelectedTeacher());
 				}
-				
+
 			});
 		}
 
@@ -203,45 +197,35 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		// JLabel emptyLabel = new JLabel("");
 		// Grund-Daten
 		JPanel panelBasicData = new JPanel(gridLayout);
-		nameLabel = new JLabel("");
-		genderLabel = new JLabel("");
-		schoolTypeLabel = new JLabel("");
-		birthdayLabel = new JLabel("");
-		ageLabel = new JLabel("");
-		schoolAgeLabel = new JLabel("");
-		panelBasicData.add(nameLabel);
-		panelBasicData.add(genderLabel);
-		panelBasicData.add(schoolTypeLabel);
-		panelBasicData.add(birthdayLabel);
-		panelBasicData.add(ageLabel);
-		panelBasicData.add(schoolAgeLabel);
-		panelBasicData.setBorder(BorderFactory
-				.createTitledBorder("Grund-Daten"));
+		panelBasicData.add(contentLabels.get(0));
+		panelBasicData.add(contentLabels.get(1));
+		panelBasicData.add(contentLabels.get(2));
+		panelBasicData.add(contentLabels.get(3));
+		panelBasicData.add(contentLabels.get(4));
+		panelBasicData.add(contentLabels.get(5));
+		panelBasicData.setBorder(BorderFactory.createTitledBorder("Grund-Daten"));
 
 		// Unterrichtspflichzeit
 		JPanel panelTeachingTime = new JPanel(gridLayout);
-		panelTeachingTime.setBorder(BorderFactory
-				.createTitledBorder("Unterrichtspflichzeit"));
-		teachingTimeLabel = new JLabel("");
-		curSum1Label = new JLabel("");
-		curSum1Label.setHorizontalAlignment(JLabel.RIGHT);
-		panelTeachingTime.add(teachingTimeLabel);
-		panelTeachingTime.add(curSum1Label);
+		panelTeachingTime.setBorder(BorderFactory.createTitledBorder("Unterrichtspflichzeit"));
+		panelTeachingTime.add(contentLabels.get(6));
+		panelTeachingTime.add(curSumLabels.get(0));
+		panelTeachingTime.add(contentLabels.get(7));
+		panelTeachingTime.add(curSumLabels.get(1));
+		panelTeachingTime.add(contentLabels.get(8));
+		panelTeachingTime.add(curSumLabels.get(2));
+		panelTeachingTime.add(contentLabels.get(9));
+		panelTeachingTime.add(curSumLabels.get(3));
 
 		// Altersermaessigung
 		JPanel panelSeniorReduction = new JPanel(gridLayout);
-		seniorReductionLabel = new JLabel("");
-		curSum2Label = new JLabel("");
-		curSum2Label.setHorizontalAlignment(JLabel.RIGHT);
-		panelSeniorReduction.add(seniorReductionLabel);
-		panelSeniorReduction.add(curSum2Label);
-		panelSeniorReduction.setBorder(BorderFactory
-				.createTitledBorder("Alterserm\u00e4\u00dfigung"));
+		panelSeniorReduction.add(contentLabels.get(10));
+		panelSeniorReduction.add(curSumLabels.get(4));
+		panelSeniorReduction.setBorder(BorderFactory.createTitledBorder("Alterserm\u00e4\u00dfigung"));
 
 		// Anrechnung
 		JPanel panelPlusMinus = new JPanel(new GridLayout(1, 0));
-		panelPlusMinus
-				.setBorder(BorderFactory.createTitledBorder("Anrechnung"));
+		panelPlusMinus.setBorder(BorderFactory.createTitledBorder("Anrechnung"));
 
 		// Einsatz
 		JPanel panelActDo = new JPanel(new GridLayout(1, 0));
@@ -254,93 +238,46 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		teacherInfoText.addMouseListener(new PopClickListener());
 		teacherInfoText.setEditable(false);
 		teacherInfoText.setFont(monospacedFont);
-		JScrollPane scrollPaneTeacherInfoTable = new JScrollPane(
-				teacherInfoText);
+		JScrollPane scrollPaneTeacherInfoTable = new JScrollPane(teacherInfoText);
 		panelTeacherInfo.add(scrollPaneTeacherInfoTable);
 
-		layout.setHorizontalGroup(layout
-				.createSequentialGroup()
-				.addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE,
-						panelTeacher.getPreferredSize().width,
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+				.addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE, panelTeacher.getPreferredSize().width,
 						GroupLayout.PREFERRED_SIZE)
-				.addComponent(infoPanel, GroupLayout.PREFERRED_SIZE,
-						infoPanel.getPreferredSize().width + 20,
+				.addComponent(infoPanel, GroupLayout.PREFERRED_SIZE, infoPanel.getPreferredSize().width + 20,
 						GroupLayout.PREFERRED_SIZE)
-				.addGroup(
-						layout.createParallelGroup(
-								GroupLayout.Alignment.TRAILING)
-								.addComponent(panelBasicData,
-										GroupLayout.PREFERRED_SIZE,
-										screenWidth / 4,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(panelTeachingTime,
-										GroupLayout.PREFERRED_SIZE,
-										screenWidth / 4,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(panelSeniorReduction,
-										GroupLayout.PREFERRED_SIZE,
-										screenWidth / 4,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(panelPlusMinus,
-										GroupLayout.PREFERRED_SIZE,
-										screenWidth / 4,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(panelActDo,
-										GroupLayout.PREFERRED_SIZE,
-										screenWidth / 4,
-										GroupLayout.PREFERRED_SIZE))
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+						.addComponent(panelBasicData, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelTeachingTime, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelSeniorReduction, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelPlusMinus, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelActDo, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
+								GroupLayout.PREFERRED_SIZE))
 				.addComponent(panelTeacherInfo));
 
-		layout.setVerticalGroup(layout
-				.createSequentialGroup()
-				.addGroup(
-						layout.createParallelGroup(
-								GroupLayout.Alignment.LEADING)
-								.addGroup(
-										layout.createParallelGroup(
-												GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														panelTeacher,
-														GroupLayout.PREFERRED_SIZE,
-														screenHeight,
-														GroupLayout.PREFERRED_SIZE)
-												.addComponent(
-														infoPanel,
-														GroupLayout.PREFERRED_SIZE,
-														screenHeight,
-														GroupLayout.PREFERRED_SIZE)
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		panelBasicData,
-																		GroupLayout.PREFERRED_SIZE,
-																		(screenHeight - 20) / 5,
-																		GroupLayout.PREFERRED_SIZE)
-																.addComponent(
-																		panelTeachingTime,
-																		GroupLayout.PREFERRED_SIZE,
-																		(screenHeight - 20) / 5,
-																		GroupLayout.PREFERRED_SIZE)
-																.addComponent(
-																		panelSeniorReduction,
-																		GroupLayout.PREFERRED_SIZE,
-																		(screenHeight - 20) / 5,
-																		GroupLayout.PREFERRED_SIZE)
-																.addComponent(
-																		panelPlusMinus,
-																		GroupLayout.PREFERRED_SIZE,
-																		(screenHeight - 20) / 5,
-																		GroupLayout.PREFERRED_SIZE)
-																.addComponent(
-																		panelActDo,
-																		GroupLayout.PREFERRED_SIZE,
-																		(screenHeight - 20) / 5,
-																		GroupLayout.PREFERRED_SIZE))
-												.addComponent(
-														panelTeacherInfo,
-														GroupLayout.PREFERRED_SIZE,
-														screenHeight,
-														GroupLayout.PREFERRED_SIZE))));
+		layout.setVerticalGroup(layout.createSequentialGroup()
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(panelTeacher, GroupLayout.PREFERRED_SIZE, screenHeight,
+										GroupLayout.PREFERRED_SIZE)
+						.addComponent(infoPanel, GroupLayout.PREFERRED_SIZE, screenHeight, GroupLayout.PREFERRED_SIZE)
+						.addGroup(layout.createSequentialGroup()
+								.addComponent(panelBasicData, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(panelTeachingTime, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(panelSeniorReduction, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(panelPlusMinus, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(panelActDo, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+										GroupLayout.PREFERRED_SIZE))
+								.addComponent(panelTeacherInfo, GroupLayout.PREFERRED_SIZE, screenHeight,
+										GroupLayout.PREFERRED_SIZE))));
 	}
 
 	@Override
@@ -356,41 +293,72 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		Teacher selectedTeacher = model.getSelectedTeacher();
 		if (selectedTeacher != null) {
 			for (int i = 0; i < teacherDataFields.size(); i++) {
-				teacherDataFields.get(i).setText(
-						selectedTeacher.getTeacherData().get(i));
+				teacherDataFields.get(i).setText(selectedTeacher.getTeacherData().get(i));
 			}
 
-			nameLabel.setText(selectedTeacher.getTeacherData().get(1) + " "
-					+ selectedTeacher.getTeacherData().get(0));
+			contentLabels.get(0)
+					.setText(selectedTeacher.getTeacherData().get(1) + " " + selectedTeacher.getTeacherData().get(0));
 			String gender = selectedTeacher.getTeacherData().get(3);
 			if (gender.substring(0, 1).equals("m"))
-				genderLabel.setText("m\u00e4nnlich");
+				contentLabels.get(1).setText("m\u00e4nnlich");
 			else
-				genderLabel.setText("weiblich");
+				contentLabels.get(1).setText("weiblich");
 
-			SchoolType selectedSchoolType = model.getSchool().getSchoolTypeByAbbr(selectedTeacher.getTeacherData().get(4));
-			String schoolTypeName = selectedSchoolType.getName();
+			contentLabels.get(4).setText("Alter: " + selectedTeacher.getAge() + "");
+			int schoolAge = selectedTeacher.getSchoolAge();
+			contentLabels.get(5).setText("Schuljahr-Alter: " + schoolAge + "");
 
-			schoolTypeLabel.setText(schoolTypeName);
-			birthdayLabel.setText(selectedTeacher.getTeacherData().get(5));
+			SchoolType selectedSchoolType = model.getSchool()
+					.getSchoolTypeByAbbr(selectedTeacher.getTeacherData().get(5));
 
-			ageLabel.setText("Alter: " + selectedTeacher.getAge() + "");
-			schoolAgeLabel.setText("Schuljahr-Alter: "
-					+ selectedTeacher.getSchoolAge() + "");
-			Double teachingTime = selectedSchoolType.getTeachingTime();
-			teachingTimeLabel
-					.setText("Unterrichtspflichtzeit: " + teachingTime);
-			curSum1Label.setText("Zw.Su.=" + teachingTime + "");
+			String schoolTypeName = "";
+			Double teachingTime = 0.0;
+			Double seniorReductionAuto = 0.0;
+			if (selectedSchoolType != null) {
+				schoolTypeName = selectedSchoolType.getName();
+				teachingTime = selectedSchoolType.getTeachingTime();
+				seniorReductionAuto = selectedSchoolType.getPartialRetirement(schoolAge);
+			}
+
+			contentLabels.get(6).setText(schoolTypeName + ": " + teachingTime + " h");
+			curSumLabels.get(0).setText("Zw.Su.=" + teachingTime + " h");
+
+			contentLabels.get(7).setText("");
+			curSumLabels.get(1).setText("");
+			if (seniorReductionAuto > 0) {
+				contentLabels.get(7).setText("Altersteilzeit mit " + schoolAge + ": " + seniorReductionAuto + " h");
+				curSumLabels.get(1).setText("Zw.Su.=" + (teachingTime - seniorReductionAuto) + " h");
+			}
+
+			String partTimeString = selectedTeacher.getTeacherData().get(7).trim();
+			Double partTime = 0.0;
+			if (partTimeString.equals("V") || partTimeString.equals("")) {
+				contentLabels.get(8).setText("Vollzeit");
+				curSumLabels.get(2).setText("Zw.Su.=" + (teachingTime - seniorReductionAuto) + " h");
+			} else {
+				contentLabels.get(8).setText("Teilzeit " + partTimeString);
+				partTime = Double.parseDouble(partTimeString.substring(1));
+				curSumLabels.get(2).setText("Zw.Su.=" + (partTime) + " h");
+			}
+
+			contentLabels.get(9).setText("Wissenschaftlicher Unterricht");
+			if (partTime > 0)
+				curSumLabels.get(3).setText("Zw.Su.=" + partTime + " h");
+			else
+				curSumLabels.get(3).setText("Zw.Su.=" + (teachingTime - seniorReductionAuto) + " h");
+
+			//
+			// partTimeLabel.setText(selectedTeacher.getTeacherData()
+			// .get(7).trim());
 
 			Double seniorReduction = 0.0;
-			String seniorReductionString = selectedTeacher.getTeacherData()
-					.get(10).trim();
+			String seniorReductionString = selectedTeacher.getTeacherData().get(10).trim();
 			if (!seniorReductionString.equals(""))
 				seniorReduction = Double.parseDouble(seniorReductionString);
 
-			seniorReductionLabel.setText("Alterserm.: " + seniorReduction);
+			contentLabels.get(10).setText("Alterserm.: " + seniorReduction);
 			Double curSum2 = teachingTime - seniorReduction;
-			curSum2Label.setText("Zw.Su.=" + curSum2);
+			curSumLabels.get(4).setText("Zw.Su.=" + curSum2);
 
 			teacherInfoText.setText(selectedTeacher.getTeacherSpmText());
 		}

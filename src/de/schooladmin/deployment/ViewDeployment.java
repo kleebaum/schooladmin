@@ -71,8 +71,6 @@ public class ViewDeployment extends View implements ViewDeploymentInterface, Tab
 
 	protected JList<String> teacherList;
 	protected JPanel classCards;
-	// protected HashMap<SchoolClass, HashMap<SchoolSubject, JTable>>
-	// classTablesMap;
 
 	private CardLayout classCardLayout;
 
@@ -156,10 +154,32 @@ public class ViewDeployment extends View implements ViewDeploymentInterface, Tab
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				model.exportTeacherOverviewToCVS();
+				model.exportTeacherOverviewToCVS(true);
 			}
 
 		});
+		
+		JMenuItem menuItemOpenFile = new JMenuItem("Speichern und \u00f6ffnen");
+		overviewMenu.add(menuItemOpenFile);
+		menuItemOpenFile.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				model.exportTeacherOverviewToCVS(false);
+				File file = new File("Vergleich-Ist-Soll.csv");
+
+				Desktop desktop = Desktop.getDesktop();
+				if (file.exists())
+					try {
+						desktop.open(file);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				
+			}
+
+		});		
 
 		return menuBar;
 	}
@@ -249,16 +269,26 @@ public class ViewDeployment extends View implements ViewDeploymentInterface, Tab
 		if (schoolClass != model.getSelectedClass()) {
 			menuBar.add(localMenu);
 
-			JMenuItem menuItemSave = new JMenuItem("Speichern als");
+			JMenuItem menuItemSave = new JMenuItem("Speichern");
 			localMenu.add(menuItemSave);
 			menuItemSave.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-						model.exportSchoolClassToCVS(schoolClass, true);
+					model.exportSchoolClassToCVS(schoolClass, false);
 				}
 			});
-			
+
+			JMenuItem menuItemSaveAs = new JMenuItem("Speichern als");
+			localMenu.add(menuItemSaveAs);
+			menuItemSaveAs.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					model.exportSchoolClassToCVS(schoolClass, true);
+				}
+			});
+
 			JMenuItem menuItemOpenFile = new JMenuItem("Datei \u00f6ffnen");
 			localMenu.add(menuItemOpenFile);
 			menuItemOpenFile.addActionListener(new ActionListener() {
@@ -277,7 +307,7 @@ public class ViewDeployment extends View implements ViewDeploymentInterface, Tab
 						}
 				}
 			});
-			
+
 			localMenu.add(new JSeparator());
 
 			JMenuItem newSubjectItem = new JMenuItem("Fach hinzuf\u00fcgen");
@@ -501,9 +531,9 @@ public class ViewDeployment extends View implements ViewDeploymentInterface, Tab
 		Teacher selectedTeacher = model.getSelectedTeacher();
 
 		DefaultTableModel teacherInfoTableModel = new DefaultTableModel();
-		for (Object object : subjectTableHeader) {
-			teacherInfoTableModel.addColumn(object);
-		}
+		teacherInfoTableModel.addColumn("Fach");
+		teacherInfoTableModel.addColumn("Gruppe");
+		teacherInfoTableModel.addColumn("Lehrer");
 
 		if (selectedTeacher != null) {
 			for (SchoolGroup group : selectedTeacher.getSchoolGroups()) {
@@ -528,7 +558,7 @@ public class ViewDeployment extends View implements ViewDeploymentInterface, Tab
 	public JPopupMenu createPopUpMenu(final MouseEvent e) {
 		popupMenu = super.createPopUpMenu(e);
 
-		JMenuItem printItem = new JMenuItem("Ansicht drucken");
+		JMenuItem printItem = new JMenuItem("Bildschirmfoto drucken");
 		popupMenu.add(printItem);
 		printItem.addActionListener(new ActionListener() {
 			@Override

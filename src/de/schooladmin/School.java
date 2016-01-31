@@ -39,8 +39,6 @@ public class School {
 	}	
 	
 	public Teacher getTeacherByAbbr(String abbr) {
-		if (abbr.equals(""))
-			return null;
 		return teacherAbbrMap.get(abbr);
 	}
 	

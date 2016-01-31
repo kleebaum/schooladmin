@@ -325,30 +325,26 @@ public class View extends JFrame implements ObserverInterface, ViewInterface {
 
 	@Override
 	public JList<String> createTeacherNameList() {
+		ArrayList<Teacher> teachers = model.getSchool().getTeachers();
+		
 		final JList<String> teacherList = new JList<String>();
 		teacherList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		ArrayList<String> resultArrayList = new ArrayList<String>();
-		int i = 0;
-		for (Teacher teacher : model.getSchool().getTeachers()) {
-			teacherListMap.put(teacher, i);
-			resultArrayList.add(teacher.getAbbr() + " = " + teacher.getSurname() + ", " + teacher.getFirstname() + "");
-			i++;
+		String[] teacherArray = new String[teachers.size()]; 
+		for (int i = 0; i<teachers.size(); i++) {
+			teacherListMap.put(teachers.get(i), i);
+			teacherArray[i] = teachers.get(i).getAbbr() + " = " + teachers.get(i).getSurname() + ", " + teachers.get(i).getFirstname() + "";
 		}
+		teacherList.setListData(teacherArray);
 
 		teacherList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
 				if (!evt.getValueIsAdjusting()) {
-					for (Teacher teacher : model.getSchool().getTeachers()) {
-						if (teacher.getAbbr().equals(teacherList.getSelectedValue().split(" ")[0])) {
-							controller.setSelectedTeacher(teacher);
-						}
-					}
+					controller.setSelectedTeacher(model.getSchool().getTeachers().get(teacherList.getSelectedIndex()));
 				}
 			}
 		});
-		String[] resultArray = resultArrayList.toArray(new String[resultArrayList.size()]);
-		teacherList.setListData(resultArray);
+		
 		return teacherList;
 	}
 

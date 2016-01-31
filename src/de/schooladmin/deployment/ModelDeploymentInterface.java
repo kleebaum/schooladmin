@@ -16,6 +16,6 @@ public interface ModelDeploymentInterface extends ModelInterface {
 	
 	void exportSchoolClassToCVS(SchoolClass schoolClass, boolean fileChooser);
 
-	void exportTeacherOverviewToCVS();
+	void exportTeacherOverviewToCVS(boolean fileChooser);
 	
 }

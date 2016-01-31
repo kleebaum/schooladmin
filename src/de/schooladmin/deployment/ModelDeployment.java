@@ -20,8 +20,6 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 
 	public ModelDeployment() {
 		super();
-		// this.classSubjectsMap = new HashMap<SchoolClass,
-		// ArrayList<SchoolSubject>>();
 	}
 
 	@Override
@@ -36,7 +34,6 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 			ArrayList<SchoolSubject> localSubjects = initSchoolClasses(className);
 			SchoolClass localClass = new SchoolClass(className, localSubjects);
 			school.getClasses().add(localClass);
-			// classNameMap.put(className, localClass);
 		}
 	}
 
@@ -67,14 +64,19 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 				continue;
 			}
 			String subject = line.get(0);
-
 			String group = line.get(1);
 			String abbr = line.get(2);
+			if(abbr.equals(" ") || abbr == null) {
+				abbr = "";
+			}
 			int hoursOnSubject = Integer.parseInt(line.get(3).trim());
 			Teacher teacher = school.getTeacherByAbbr(abbr);
 			SchoolGroup localGroup = null;
 			if (teacher == null) {
-				teacher = new Teacher("Lehrer fehlt in LehrerDaten.csv", "", abbr);
+				if (abbr.equals(""))
+					teacher = new Teacher("Zuordnung fehlt", "", "");
+				else
+					teacher = new Teacher("Lehrer fehlt in LehrerDaten.csv", "", abbr);
 				school.getTeachers().add(teacher);
 				school.getTeacherAbbrMap().put(abbr, teacher);
 				teacher.initSchoolGroups();
@@ -132,8 +134,8 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 			school.getTeacherAbbrMap().put(abbr, teacher);
 			teacher.initSchoolGroups();
 			try {
-				double toDo = Double.parseDouble(line.get(5).trim());
 				String schoolType = line.get(6);
+				double toDo = Double.parseDouble(line.get(5).trim());
 				String subjects = line.get(7);
 				teacher.setToDo(toDo);
 				teacher.setSchoolType(schoolType);
@@ -162,7 +164,7 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 	}
 
 	@Override
-	public void exportTeacherOverviewToCVS() {
+	public void exportTeacherOverviewToCVS(boolean fileChooser) {
 		ArrayList<String> content = new ArrayList<String>();
 
 		for (Teacher teacher : school.getTeachers()) {
@@ -170,6 +172,6 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 					+ teacher.getActDo() + ";");
 		}
 
-		exportToCVS("", "Vergleich-Ist-Soll.csv", "Nachname;Vorname;Soll;Ist;", content, true);
+		exportToCVS("", "Vergleich-Ist-Soll.csv", "Nachname;Vorname;Soll;Ist;", content, fileChooser);
 	}
 }
