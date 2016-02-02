@@ -7,7 +7,7 @@ public interface ModelInterface {
 	
 	// input file location
 	final String ConfigFile = "input/config.txt";
-	final String version = "1.2.4";
+	final String version = "1.2.9";
 	
 	/**
 	 * observing view is registered

@@ -2,7 +2,6 @@ package de.schooladmin;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -76,18 +75,25 @@ public class Teacher {
 		this(surname, firstname, abbr);
 		this.timeTableText = readTeacherTimeTableTextFromFile(timeTableFile);
 	}
-	
+
 	public Teacher(String surname, String firstname, String abbr, String timeTableFile, String statisticsFile) {
 		this(surname, firstname, abbr, timeTableFile);
 		this.teacherSpmText = readTeacherSpmTextFromFile(statisticsFile);
 	}
-	
+
 	public Teacher(ArrayList<String> teacherData) {
 		this.teacherData = teacherData;
 	}
-	
+
 	public Teacher(ArrayList<String> teacherData, String timeTableFile, String statisticsFile) {
-		this(teacherData.get(0), teacherData.get(1) ,teacherData.get(2), timeTableFile);
+		this(teacherData.get(0), teacherData.get(1), teacherData.get(2), timeTableFile);
+		this.teacherData = teacherData;
+		this.teacherSpmText = readTeacherSpmTextFromFile(statisticsFile);
+		this.birthday = teacherData.get(4);
+	}
+	
+	public Teacher(ArrayList<String> teacherData, String statisticsFile) {
+		this(teacherData.get(0), teacherData.get(1), teacherData.get(2));
 		this.teacherData = teacherData;
 		this.teacherSpmText = readTeacherSpmTextFromFile(statisticsFile);
 		this.birthday = teacherData.get(4);
@@ -136,7 +142,7 @@ public class Teacher {
 		String spmText = "";
 		boolean foundSpm = false;
 		try {
-			in = new BufferedReader(new FileReader(fileName));
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1));
 			String line = null;
 			String lastLine = null;
 			while ((line = in.readLine()) != null) {
@@ -149,17 +155,18 @@ public class Teacher {
 					foundSpm = true;
 					spmText += line + "\r\n";
 				}
-			lastLine = line;			
+				lastLine = line;
 			}
 			int lastLineLength = lastLine.trim().length();
-			if (lastLine != null & lastLineLength > 1) {				
-				this.actDo = Double.parseDouble(lastLine.substring(lastLineLength-2, lastLineLength).replaceAll("(^\\s+)|.", "0"));
-			}			
+			if (lastLine != null & lastLineLength > 1) {
+				this.actDo = Double.parseDouble(
+						lastLine.substring(lastLineLength - 2, lastLineLength).replaceAll("(^\\s+)|.", "0"));
+			}
 		} catch (IOException | java.lang.NullPointerException e) {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		return spmText;
 	}
 
@@ -411,27 +418,29 @@ public class Teacher {
 		int age = this.getAge();
 
 		DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-		Date date = new Date();
-		Calendar now = Calendar.getInstance();
-		now.setTime(date);	
+		Date now = new Date();
 
-		Calendar born = Calendar.getInstance();
+		DateFormat formatMonth = new SimpleDateFormat("MM");
+		DateFormat formatYear = new SimpleDateFormat("yyyy");
+
 		if (!this.birthday.equals("")) {
 
 			Date birthdayDate = new Date();
-			
+
 			try {
 				birthdayDate = format.parse(this.birthday);
-				born.setTime(birthdayDate);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (now.get(Calendar.MONTH) > 1 && now.get(Calendar.MONTH) < 8 && born.get(Calendar.MONTH) > 1
-					&& born.get(Calendar.MONTH) < 8) {
-				System.out.println("hier");
+			int monthNow = Integer.parseInt(formatMonth.format(now));
+			int monthBirthday = Integer.parseInt(formatMonth.format(birthdayDate));
+			int yearNow = Integer.parseInt(formatYear.format(now));
+			int yearBirthday = Integer.parseInt(formatYear.format(birthdayDate));
+			if (monthNow > 1 && monthNow < 8 && monthBirthday > 1 && monthBirthday < 8
+					&& yearNow == yearBirthday + age) {
 				age--;
-			}			
+			}
 		}
 		return age;
 	}

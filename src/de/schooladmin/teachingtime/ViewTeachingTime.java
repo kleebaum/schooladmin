@@ -7,8 +7,11 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -40,6 +43,7 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 	ArrayList<JLabel> teacherDataLabels;
 	ArrayList<JLabel> contentLabels;
 	ArrayList<JLabel> curSumLabels;
+	ArrayList<Double> curSums;
 
 	private static final long serialVersionUID = 1L;
 	ModelTeachingTimeInterface model;
@@ -58,16 +62,18 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 			this.teacherDataFields.add(new JTextField(""));
 			this.teacherDataLabels.add(new JLabel(teacherDataEntry));
 		}
+		this.curSums = new ArrayList<Double>();
 		this.curSumLabels = new ArrayList<JLabel>();
 		this.contentLabels = new ArrayList<JLabel>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 30; i++) {
 			JLabel newContentLabel = new JLabel("");
 			this.contentLabels.add(newContentLabel);
 		}
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 25; i++) {
 			JLabel newCurSumLabel = new JLabel("");
 			newCurSumLabel.setHorizontalAlignment(JLabel.RIGHT);
 			this.curSumLabels.add(newCurSumLabel);
+			this.curSums.add(0.0);
 		}
 	}
 
@@ -115,7 +121,7 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		menuFile.add(new JSeparator());
 		menuFile.add(menuItemClose);
 
-		JMenu overviewMenu = new JMenu("\u00dcberblick");
+		final JMenu overviewMenu = new JMenu("\u00dcberblick");
 
 		menuBar.add(overviewMenu);
 		overviewMenu.addMenuListener(new MenuListener() {
@@ -131,9 +137,40 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 			@Override
 			public void menuSelected(MenuEvent arg0) {
 				cardLayout.show(cards, "overviewPanel");
+
+				final Teacher selectedTeacher = model.getSelectedTeacher();
+				if (selectedTeacher != null) {
+					overviewMenu.removeAll();
+					JMenuItem openSelectedTeacherInfos = new JMenuItem(
+							"Lehrer-Infos von " + selectedTeacher.getSurname() + " in Editor \u00f6ffnen");
+					overviewMenu.add(openSelectedTeacherInfos);
+					openSelectedTeacherInfos.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							PrintWriter w;
+
+							try {
+								File datei = File.createTempFile("plan", ".txt");
+								w = new PrintWriter(new BufferedWriter(new FileWriter(datei)));
+
+								w.print(getTeacherInfoText(selectedTeacher));
+								w.flush();
+								w.close();
+
+								Desktop.getDesktop().open(datei);
+								datei.deleteOnExit();
+
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+
+					});
+				}
 			}
 		});
-
 		return menuBar;
 
 	}
@@ -175,13 +212,12 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		c.weightx = 1.7;
 		c.weighty = 2.0;
 
-		teacherDataFields.get(0)
-				.setPreferredSize(new Dimension(120, teacherDataFields.get(0).getPreferredSize().height));
 		for (int i = 0; i < teacherDataFields.size(); i++) {
 			c.gridx = 0;
 			c.gridy = i;
 			infoPanel.add(this.teacherDataLabels.get(i), c);
 			c.gridx = 1;
+			teacherDataFields.get(i).setPreferredSize(new Dimension(180, 20));
 			infoPanel.add(this.teacherDataFields.get(i), c);
 			this.teacherDataFields.get(i).addActionListener(new ActionListener() {
 
@@ -193,8 +229,6 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 			});
 		}
 
-		// gridLayout.setHgap(10);
-		// JLabel emptyLabel = new JLabel("");
 		// Grund-Daten
 		JPanel panelBasicData = new JPanel(gridLayout);
 		panelBasicData.add(contentLabels.get(0));
@@ -217,19 +251,30 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 		panelTeachingTime.add(contentLabels.get(9));
 		panelTeachingTime.add(curSumLabels.get(3));
 
-		// Altersermaessigung
-		JPanel panelSeniorReduction = new JPanel(gridLayout);
-		panelSeniorReduction.add(contentLabels.get(10));
-		panelSeniorReduction.add(curSumLabels.get(4));
-		panelSeniorReduction.setBorder(BorderFactory.createTitledBorder("Alterserm\u00e4\u00dfigung"));
-
 		// Anrechnung
-		JPanel panelPlusMinus = new JPanel(new GridLayout(1, 0));
+		JPanel panelPlusMinus = new JPanel(gridLayout);
 		panelPlusMinus.setBorder(BorderFactory.createTitledBorder("Anrechnung"));
+		panelPlusMinus.add(contentLabels.get(11));
+		panelPlusMinus.add(new JLabel(""));
+
+		for (int i = 0; i < 8; i++) {
+			panelPlusMinus.add(contentLabels.get(12 + i));
+			panelPlusMinus.add(curSumLabels.get(4 + i));
+		}
 
 		// Einsatz
-		JPanel panelActDo = new JPanel(new GridLayout(1, 0));
+		JPanel panelActDo = new JPanel(gridLayout);
 		panelActDo.setBorder(BorderFactory.createTitledBorder("Einsatz"));
+		panelActDo.add(contentLabels.get(10));
+		panelActDo.add(new JLabel(""));
+		panelActDo.add(contentLabels.get(20));
+		panelActDo.add(new JLabel(""));
+		panelActDo.add(contentLabels.get(21));
+		panelActDo.add(new JLabel(""));
+		panelActDo.add(contentLabels.get(22));
+		panelActDo.add(new JLabel(""));
+		panelActDo.add(contentLabels.get(23));
+		panelActDo.add(new JLabel(""));
 
 		// teacher text area
 		JPanel panelTeacherInfo = new JPanel(new GridLayout(1, 0));
@@ -251,8 +296,6 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 								GroupLayout.PREFERRED_SIZE)
 						.addComponent(panelTeachingTime, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
 								GroupLayout.PREFERRED_SIZE)
-						.addComponent(panelSeniorReduction, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
-								GroupLayout.PREFERRED_SIZE)
 						.addComponent(panelPlusMinus, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
 								GroupLayout.PREFERRED_SIZE)
 						.addComponent(panelActDo, GroupLayout.PREFERRED_SIZE, screenWidth / 4,
@@ -266,15 +309,13 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 										GroupLayout.PREFERRED_SIZE)
 						.addComponent(infoPanel, GroupLayout.PREFERRED_SIZE, screenHeight, GroupLayout.PREFERRED_SIZE)
 						.addGroup(layout.createSequentialGroup()
-								.addComponent(panelBasicData, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+								.addComponent(panelBasicData, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 4,
 										GroupLayout.PREFERRED_SIZE)
-								.addComponent(panelTeachingTime, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+								.addComponent(panelTeachingTime, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 4,
 										GroupLayout.PREFERRED_SIZE)
-								.addComponent(panelSeniorReduction, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+								.addComponent(panelPlusMinus, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 4,
 										GroupLayout.PREFERRED_SIZE)
-								.addComponent(panelPlusMinus, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
-										GroupLayout.PREFERRED_SIZE)
-								.addComponent(panelActDo, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 5,
+								.addComponent(panelActDo, GroupLayout.PREFERRED_SIZE, (screenHeight - 20) / 4,
 										GroupLayout.PREFERRED_SIZE))
 								.addComponent(panelTeacherInfo, GroupLayout.PREFERRED_SIZE, screenHeight,
 										GroupLayout.PREFERRED_SIZE))));
@@ -304,63 +345,96 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 			else
 				contentLabels.get(1).setText("weiblich");
 
+			// birthday
+			contentLabels.get(3).setText(selectedTeacher.getTeacherData().get(4));
+
+			// age
 			contentLabels.get(4).setText("Alter: " + selectedTeacher.getAge() + "");
 			int schoolAge = selectedTeacher.getSchoolAge();
 			contentLabels.get(5).setText("Schuljahr-Alter: " + schoolAge + "");
 
+			// school type
 			SchoolType selectedSchoolType = model.getSchool()
 					.getSchoolTypeByAbbr(selectedTeacher.getTeacherData().get(5));
 
 			String schoolTypeName = "";
 			Double teachingTime = 0.0;
-			Double seniorReductionAuto = 0.0;
+			Double seniorReduction = 0.0;
+			String scientificLessonsString = selectedTeacher.getTeacherData().get(6);
+			double scientificLessons = 0.0;
+			if (!scientificLessonsString.isEmpty() && !scientificLessonsString.startsWith(" ")
+					&& !scientificLessonsString.equals("-")) {
+				scientificLessons = Double.parseDouble(scientificLessonsString);
+			}
+			double teachingTimePerScLes = 0.0;
 			if (selectedSchoolType != null) {
 				schoolTypeName = selectedSchoolType.getName();
 				teachingTime = selectedSchoolType.getTeachingTime();
-				seniorReductionAuto = selectedSchoolType.getPartialRetirement(schoolAge);
+				seniorReduction = selectedSchoolType.getPartialRetirement(schoolAge);
+				teachingTimePerScLes = selectedSchoolType.getTeachingTimePerScLes(scientificLessons);
 			}
 
+			contentLabels.get(2).setText(schoolTypeName);
+
+			// teaching time depending on school type
 			contentLabels.get(6).setText(schoolTypeName + ": " + teachingTime + " h");
-			curSumLabels.get(0).setText("Zw.Su.=" + teachingTime + " h");
+			curSums.set(0, teachingTime);
 
-			contentLabels.get(7).setText("");
-			curSumLabels.get(1).setText("");
-			if (seniorReductionAuto > 0) {
-				contentLabels.get(7).setText("Altersteilzeit mit " + schoolAge + ": " + seniorReductionAuto + " h");
-				curSumLabels.get(1).setText("Zw.Su.=" + (teachingTime - seniorReductionAuto) + " h");
+			// scientific lessons
+			contentLabels.get(7).setText("Wissenschaftl. Unterricht: " + scientificLessons + " h");
+			curSums.set(1, teachingTimePerScLes);
+
+			// partial retirement
+			contentLabels.get(8).setText("");
+
+			if (seniorReduction > 0) {
+				contentLabels.get(8).setText("Altersteilzeit mit " + schoolAge + ": " + seniorReduction + " h");
 			}
+			curSums.set(2, teachingTimePerScLes - seniorReduction);
 
+			// full vs. part time
 			String partTimeString = selectedTeacher.getTeacherData().get(7).trim();
 			Double partTime = 0.0;
 			if (partTimeString.equals("V") || partTimeString.equals("")) {
-				contentLabels.get(8).setText("Vollzeit");
-				curSumLabels.get(2).setText("Zw.Su.=" + (teachingTime - seniorReductionAuto) + " h");
+				contentLabels.get(9).setText("Vollzeit");
+				curSums.set(3, curSums.get(2));
 			} else {
-				contentLabels.get(8).setText("Teilzeit " + partTimeString);
+				contentLabels.get(9).setText("Teilzeit " + partTimeString);
 				partTime = Double.parseDouble(partTimeString.substring(1));
-				curSumLabels.get(2).setText("Zw.Su.=" + (partTime) + " h");
+				curSums.set(3, partTime);
 			}
 
-			contentLabels.get(9).setText("Wissenschaftlicher Unterricht");
-			if (partTime > 0)
-				curSumLabels.get(3).setText("Zw.Su.=" + partTime + " h");
-			else
-				curSumLabels.get(3).setText("Zw.Su.=" + (teachingTime - seniorReductionAuto) + " h");
+			// not counted hours
+			contentLabels.get(10).setText("Mob: " + selectedTeacher.getTeacherData().get(8) + " h");
 
-			//
-			// partTimeLabel.setText(selectedTeacher.getTeacherData()
-			// .get(7).trim());
+			// plus minus
+			contentLabels.get(11).setText(selectedTeacher.getTeacherData().get(13));
 
-			Double seniorReduction = 0.0;
-			String seniorReductionString = selectedTeacher.getTeacherData().get(10).trim();
-			if (!seniorReductionString.equals(""))
-				seniorReduction = Double.parseDouble(seniorReductionString);
+			// panel actual do vs. to do
+			contentLabels.get(20).setText("Soll 1.HJ: " + selectedTeacher.getTeacherData().get(9) + " h");
+			contentLabels.get(21).setText("Einsatz 1.HJ: " + selectedTeacher.getTeacherData().get(10) + " h");
+			contentLabels.get(22).setText("Soll 2.HJ: " + selectedTeacher.getTeacherData().get(11) + " h");
+			contentLabels.get(23).setText("Einsatz 2.HJ: " + selectedTeacher.getTeacherData().get(12) + " h");
 
-			contentLabels.get(10).setText("Alterserm.: " + seniorReduction);
-			Double curSum2 = teachingTime - seniorReduction;
-			curSumLabels.get(4).setText("Zw.Su.=" + curSum2);
+			for (int i = 0; i < 8; i++) {
+				String valueString = selectedTeacher.getTeacherData().get(14 + i);
+				Double value = 0.0;
+				if (!valueString.isEmpty() && !valueString.startsWith(" "))
+					value = Double.parseDouble(valueString);
+				curSums.set(4 + i, curSums.get(3 + i) - value);
+				contentLabels.get(12 + i).setText(model.getTeacherDataList().get(14 + i) + ": " + value + " h");
+			}
 
-			teacherInfoText.setText(selectedTeacher.getTeacherSpmText());
+			curSumLabels.get(0).setText("Zw.Su.=" + curSums.get(0) + " h");
+			for (int i = 1; i < curSums.size(); i++) {
+				if (curSums.get(i).equals(curSums.get(i - 1)))
+					curSumLabels.get(i).setText("");
+				else
+					curSumLabels.get(i).setText("Zw.Su.=" + curSums.get(i) + " h");
+
+				teacherInfoText.setText(selectedTeacher.getTeacherSpmText());
+
+			}
 		}
 	}
 
@@ -377,10 +451,23 @@ public class ViewTeachingTime extends View implements ViewTeachingTimeInterface 
 			for (String dataPoint : teacher.getTeacherData()) {
 				line += dataPoint + ";";
 			}
-			content.add(line);
+			content.add(line + ";");
 		}
 
-		model.exportToCVS("", name, header, content, fileChooser);
+		model.exportToCVS("", name, header + ";", content, fileChooser);
+	}
+
+	public String getTeacherInfoText(Teacher teacher) {
+		String teacherInfoText = teacher.getSurname() + " " + teacher.getFirstname() + "\t (" + teacher.getAbbr()
+				+ ") \t " + contentLabels.get(2).getText() + "\r\n";
+
+		teacherInfoText += teacher.getTeacherSpmText();
+		
+		teacherInfoText += contentLabels.get(6).getText() + "\r\n";
+		teacherInfoText += contentLabels.get(7).getText() + "\r\n";
+
+		return teacherInfoText;
+
 	}
 
 }

@@ -26,9 +26,9 @@ public class ModelTeachingTime extends Model implements ModelTeachingTimeInterfa
 		super.initialize();
 
 		String fileTeachers = prop.get("Teachers").toString();
-		String fileTimeTableTeachers = prop.get("TimeTableTeachers").toString();
+		//String fileTimeTableTeachers = prop.get("TimeTableTeachers").toString();
 		fileTeachersStatistics = prop.getProperty("TeachersStatistics");
-
+		
 		String[] teacherData = prop.getProperty("TeacherData").toString().split("\\s*,\\s*");
 
 		teacherDataList = new ArrayList<String>();
@@ -37,17 +37,18 @@ public class ModelTeachingTime extends Model implements ModelTeachingTimeInterfa
 			teacherDataMap.put(teacherData[i], i);
 		}
 
-		initTeachers(teacherDataList, fileTeachers, fileTimeTableTeachers);
+		initTeachers(teacherDataList, fileTeachers, null);
 
 		String[] schoolTypes = prop.get("SchoolTypes").toString().split("\\s*,\\s*");
 		String[] schoolTypeHours = prop.get("SchoolTypeHours").toString().split("\\s*,\\s*");
 		String[] schoolTypeNames = prop.get("SchoolTypesName").toString().split("\\s*,\\s*");
 		String[] partialRetirement = prop.get("PartialRetirement").toString().split("\\s*,\\s*");
-		initSchoolTypes(schoolTypes, schoolTypeHours, schoolTypeNames, partialRetirement);
+		String[] scientificLessons = prop.get("ScientificLessons").toString().split("\\s*,\\s*");
+		initSchoolTypes(schoolTypes, schoolTypeHours, schoolTypeNames, partialRetirement, scientificLessons);
 	}
 
 	public void initSchoolTypes(String[] schoolTypes, String[] schoolTypeHours, String[] schoolTypeNames,
-			String[] partialRetirement) {
+			String[] partialRetirement, String[] scientificLessons) {
 
 		ArrayList<SchoolType> schoolTypesList = new ArrayList<SchoolType>();
 		SchoolType emptyType1 = new SchoolType("", "-", 0.0);
@@ -74,6 +75,18 @@ public class ModelTeachingTime extends Model implements ModelTeachingTimeInterfa
 				}
 			}
 		}
+		
+		for (int i = 0; i < scientificLessons.length; i++) {
+			String[] line = scientificLessons[i].split(":");
+			SchoolType schoolType = school.getSchoolTypeByAbbr(line[0]);
+			if (schoolType != null) {
+				for (int j = 1; j < line.length; j = j + 2) {
+					schoolType.getScientificLessonsMap().put(Double.parseDouble(line[j]),
+							Double.parseDouble(line[j + 1]));
+				}
+			}
+		}
+		
 	}
 
 	@Override
@@ -98,7 +111,7 @@ public class ModelTeachingTime extends Model implements ModelTeachingTimeInterfa
 			for (int i = 0; i < teacherDataList.size(); i++) {
 				teacherData.add(line.get(i).trim());
 			}
-			Teacher teacher = new Teacher(teacherData, fileTimeTableTeachers, fileTeachersStatistics);
+			Teacher teacher = new Teacher(teacherData, fileTeachersStatistics);
 
 			school.getTeachers().add(teacher);
 			school.getTeacherAbbrMap().put(teacherData.get(2), teacher);
