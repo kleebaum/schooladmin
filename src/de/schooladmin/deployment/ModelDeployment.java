@@ -10,6 +10,7 @@ import de.schooladmin.ParserInterface;
 import de.schooladmin.SchoolClass;
 import de.schooladmin.SchoolGroup;
 import de.schooladmin.SchoolSubject;
+import de.schooladmin.SchoolType;
 import de.schooladmin.Teacher;
 
 /**
@@ -134,11 +135,17 @@ public class ModelDeployment extends Model implements ModelDeploymentInterface {
 			school.getTeacherAbbrMap().put(abbr, teacher);
 			teacher.initSchoolGroups();
 			try {
-				String schoolType = line.get(6);
+				String schoolTypeString = line.get(6);
 				double toDo = Double.parseDouble(line.get(5).trim());
 				String subjects = line.get(7);
 				teacher.setToDo(toDo);
-				teacher.setSchoolType(schoolType);
+				SchoolType schoolType = school.getSchoolTypeByAbbr(schoolTypeString);
+				if (schoolType == null) {
+					schoolType = new SchoolType(schoolTypeString, schoolTypeString, 0.0);
+					teacher.setSchoolType(schoolType);
+				} else {
+					teacher.setSchoolType(schoolType);
+				}						
 				teacher.setSubjects(subjects);
 			} catch (IndexOutOfBoundsException | NumberFormatException e) {
 				setError("Die Lehrerdaten Datei ist unvollst\u00e4ndig.");

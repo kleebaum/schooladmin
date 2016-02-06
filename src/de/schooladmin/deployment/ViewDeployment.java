@@ -544,7 +544,7 @@ public class ViewDeployment extends View implements ViewDeploymentInterface, Tab
 			selectedTeacherAbbrLabel.setText(selectedTeacher.getAbbr());
 			selectedTeacherNameLabel.setText(selectedTeacher.getSurname() + ", " + selectedTeacher.getFirstname());
 			selectedTeacherToDoLabel.setText(selectedTeacher.getToDo() + "");
-			selectedTeacherSchoolTypeLabel.setText(selectedTeacher.getSchoolType());
+			selectedTeacherSchoolTypeLabel.setText(selectedTeacher.getSchoolType().getName());
 			selectedTeacherActDoLabel.setText(selectedTeacher.getActDo() + "");
 
 			int selectionIndex = teacherListMap.get(selectedTeacher);

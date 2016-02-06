@@ -27,10 +27,9 @@ public class Teacher {
 	private String gender;
 	private double toDo; // Sollstunden
 	private double actDo; // aktueller Einsatz
-	private String schoolType;
-	// public ArrayList<String> schoolTypeList;
 	private String subjects;
 	private ArrayList<SchoolGroup> schoolGroups;
+	private SchoolType schoolType;
 
 	private BufferedReader in;
 
@@ -60,7 +59,7 @@ public class Teacher {
 		this.abbr = abbr;
 		this.toDo = 0;
 		this.actDo = 0;
-		this.schoolType = "Schultyp fehlt";
+		this.schoolType = new SchoolType("", "Schultyp fehlt", 0.0);
 		this.teacherData = new ArrayList<String>();
 	}
 
@@ -91,7 +90,7 @@ public class Teacher {
 		this.teacherSpmText = readTeacherSpmTextFromFile(statisticsFile);
 		this.birthday = teacherData.get(4);
 	}
-	
+
 	public Teacher(ArrayList<String> teacherData, String statisticsFile) {
 		this(teacherData.get(0), teacherData.get(1), teacherData.get(2));
 		this.teacherData = teacherData;
@@ -227,6 +226,10 @@ public class Teacher {
 	 * @return the gender
 	 */
 	public String getGender() {
+		if (gender.substring(0, 1).equals("m"))
+			return "m\u00e4nnlich";
+		else if (gender.substring(0, 1).equals("w"))
+			return "weiblich";
 		return gender;
 	}
 
@@ -281,6 +284,13 @@ public class Teacher {
 	 */
 	public void setTeacherData(ArrayList<String> teacherData) {
 		this.teacherData = teacherData;
+		if(teacherData!=null) {
+			this.surname = teacherData.get(0);
+			this.firstname = teacherData.get(1);
+			this.abbr = teacherData.get(2);
+			this.gender = teacherData.get(3);
+			this.birthday = teacherData.get(4);
+		}
 	}
 
 	public String getTimestamp() {
@@ -319,21 +329,6 @@ public class Teacher {
 	 */
 	public void setSubjects(String subjects) {
 		this.subjects = subjects;
-	}
-
-	/**
-	 * @return the schoolType
-	 */
-	public String getSchoolType() {
-		return schoolType;
-	}
-
-	/**
-	 * @param schoolType
-	 *            the schoolType to set
-	 */
-	public void setSchoolType(String schoolType) {
-		this.schoolType = schoolType;
 	}
 
 	/**
@@ -443,6 +438,108 @@ public class Teacher {
 			}
 		}
 		return age;
+	}
+
+	public SchoolType getSchoolType() {
+		if (schoolType != null)
+			return schoolType;
+		return new SchoolType("", "Schultyp fehlt", 0.0);
+	}
+
+	public void setSchoolType(SchoolType schoolType) {
+		this.schoolType = schoolType;
+	}
+
+	public double getScientificLectureTime() {
+		String scientificLessonsString = this.teacherData.get(6);
+		if (!scientificLessonsString.isEmpty() && !scientificLessonsString.startsWith(" ")
+				&& !scientificLessonsString.equals("-")) {
+			return (Double.parseDouble(scientificLessonsString));
+		}
+		return 0.0;
+	}
+
+	public double getPartTime(double inputValue) {
+		String partTimeString = this.getTeacherData().get(7).trim();
+		if (partTimeString.equals("V") || partTimeString.equals("")) {
+			return inputValue;
+		} else {
+			return Double.parseDouble(partTimeString.substring(1));
+		}
+	}
+
+	public String getPartTimeText() {
+		String partTimeString = this.getTeacherData().get(7).trim();
+		if (partTimeString.equals("V") || partTimeString.equals("")) {
+			return "Vollzeit \r\n";
+		} else {
+			return "Teilzeit " + partTimeString + "\r\n";
+		}
+	}
+
+	public double getMobHours() {
+		try {
+			double mob = Double.parseDouble(this.getTeacherData().get(8));
+			return mob;
+		} catch (NumberFormatException e) {
+			return 0.0;
+		}
+	}
+
+	public String getMobHoursText() {
+		double mob = this.getMobHours();
+		if (mob == 0) {
+			return "";
+		}
+		return "Mob: " + mob + " h \r\n";
+	}
+
+	public String getPlusMinusText() {
+		return this.getTeacherData().get(13) + "\r\n";
+	}
+
+	public double getToDo(int semester) {
+		try {
+			if (semester == 1) {
+				return Double.parseDouble(this.getTeacherData().get(9));
+			}
+			return Double.parseDouble(this.getTeacherData().get(11));
+		} catch (NumberFormatException e) {
+			return 0.0;
+		}
+	}
+
+	public String getToDoText(int semester) {
+		double toDo = this.getToDo(semester);
+		if (semester == 2 && toDo == 0)
+			return "";
+		return "Soll " + semester + ". HJ: " + toDo + " h \r\n";
+	}
+
+	public double getActDo(int semester) {
+		try {
+			if (semester == 1) {
+				return Double.parseDouble(this.getTeacherData().get(10));
+			}
+			return Double.parseDouble(this.getTeacherData().get(12));
+		} catch (NumberFormatException e) {
+			return 0.0;
+		}
+	}
+
+	public String getActDoText(int semester) {
+		double actDo = this.getActDo(semester);
+		if (semester == 2 && actDo == 0)
+			return "";
+		return "Einsatz " + semester + ". HJ: " + actDo + " h \r\n";
+	}
+	
+	public Double getSeniorReduction() {
+		return this.schoolType.getPartialRetirement(this.getSchoolAge());
+	}
+	
+	public Double getTeachingTimePerScLes() {
+		return this.schoolType.getTeachingTimePerScLes(this.getScientificLectureTime());
 	}
 
 	// public ArrayList<String> getSchoolTypeList() {
